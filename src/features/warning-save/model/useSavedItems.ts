@@ -21,24 +21,7 @@ function readStorage(): string[] {
  * SSR 안전: 초기값은 빈 집합, 마운트 후 하이드레이트.
  */
 export const useSavedItems = () => {
-  const [savedItems, setSavedItems] = useState<Set<string>>(new Set());
-  const [hydrated, setHydrated] = useState(false);
-
-  // 마운트 시 localStorage에서 로드
-  useEffect(() => {
-    setSavedItems(new Set(readStorage()));
-    setHydrated(true);
-  }, []);
-
-  // 변경 시 저장 (하이드레이트 이후에만 — 초기 빈 값으로 덮어쓰기 방지)
-  useEffect(() => {
-    if (!hydrated) return;
-    try {
-      window.localStorage.setItem(STORAGE_KEY, JSON.stringify([...savedItems]));
-    } catch {
-      // 저장 실패(용량 초과/프라이빗 모드 등)는 무시
-    }
-  }, [savedItems, hydrated]);
+  const [savedItems, setSavedItems] = useState<Set<string>>(() => new Set(readStorage()));
 
   // 다른 탭에서의 변경 동기화
   useEffect(() => {
@@ -54,6 +37,11 @@ export const useSavedItems = () => {
       const next = new Set(prev);
       if (next.has(id)) next.delete(id);
       else next.add(id);
+      try {
+        window.localStorage.setItem(STORAGE_KEY, JSON.stringify([...next]));
+      } catch {
+        // 저장 실패(용량 초과/프라이빗 모드 등)는 무시
+      }
       return next;
     });
   }, []);

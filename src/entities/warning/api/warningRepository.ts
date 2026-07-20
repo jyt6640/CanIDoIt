@@ -1,4 +1,5 @@
 import 'server-only';
+import { cache } from 'react';
 import { prisma } from '@/shared/db/prisma';
 import type { DestinationCountry } from '@/entities/destination';
 import type { Warning } from '../model/types';
@@ -54,7 +55,7 @@ function toWarning(w: PrismaWarning): Warning {
 }
 
 /** 모든 국가와 도시 목록 (검색 셀렉트 / 정적 경로 생성용) */
-export async function getCountries(): Promise<DestinationCountry[]> {
+export const getCountries = cache(async (): Promise<DestinationCountry[]> => {
   const countries = await prisma.country.findMany({
     orderBy: { name: 'asc' },
     include: { cities: { orderBy: { name: 'asc' } } },
@@ -64,7 +65,7 @@ export async function getCountries(): Promise<DestinationCountry[]> {
     slug: c.slug,
     cities: c.cities.map((city) => ({ name: city.name, slug: city.slug })),
   }));
-}
+});
 
 /**
  * 여행지별 주의사항 조회.
@@ -72,10 +73,10 @@ export async function getCountries(): Promise<DestinationCountry[]> {
  * - citySlug 있음: 국가 공통 + 해당 도시 특화 주의사항
  * 반환값이 null 이면 해당 국가(또는 도시)가 존재하지 않음.
  */
-export async function getDestinationWarnings(
+export const getDestinationWarnings = cache(async (
   countrySlug: string,
   citySlug?: string,
-): Promise<DestinationWarnings | null> {
+): Promise<DestinationWarnings | null> => {
   const country = await prisma.country.findUnique({
     where: { slug: countrySlug },
     include: { cities: true },
@@ -104,4 +105,4 @@ export async function getDestinationWarnings(
     city: city ? { name: city.name, slug: city.slug } : null,
     warnings: warnings.map(toWarning),
   };
-}
+});
