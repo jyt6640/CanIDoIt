@@ -92,3 +92,13 @@ model Source {
   warning   Warning   @relation(fields: [warningId], references: [id], onDelete: Cascade)
   warningId String
 }
+
+model SyncProfile {
+  id            String   @id @default(cuid())
+  token         String   @unique
+  warningKeys   String[] @default([])
+  notifyChanges Boolean  @default(false)
+  lastCheckedAt DateTime @default(now())
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+}
