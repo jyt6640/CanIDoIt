@@ -18,43 +18,49 @@ export const Navigation = ({ onScrollToSearch }: NavigationProps) => {
   const [menuOpen, setMenuOpen] = useState(false);
 
   return (
-    <nav className="relative z-30 w-full px-5 md:px-[120px] py-4 flex justify-between items-center bg-transparent">
-      <div className="font-noto font-bold text-2xl tracking-[-1.2px] text-black cursor-pointer">해도돼?</div>
-
-      {/* Desktop Menu */}
-      <div className="hidden md:flex items-center gap-8 font-noto font-medium text-[15px] tracking-tight text-gray-800">
-        {MENU_ITEMS.map((item) => (
-          <Link key={item.label} href={item.href} className="hover:text-black transition-colors">
-            {item.label}
-          </Link>
-        ))}
-      </div>
-
-      {/* Action Buttons */}
-      <div className="flex items-center gap-2">
-        <Link href="/saved" className="hidden md:flex items-center justify-center w-[110px] h-[42px] rounded-full hover:bg-black/5 transition-colors font-noto text-[14px] font-medium text-black">
-          저장한 여행
+    <nav className="relative z-30 w-full bg-transparent px-5 py-4 md:px-12">
+      <div className="mx-auto grid h-[42px] w-full max-w-[1200px] grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] items-center">
+        <Link
+          href="/"
+          className="justify-self-start font-noto text-2xl font-bold tracking-[-1.2px] text-black"
+        >
+          해도돼?
         </Link>
-        <button
-          onClick={onScrollToSearch}
-          className="flex items-center justify-center w-auto px-6 md:w-[101px] h-[42px] rounded-full bg-black text-white hover:bg-gray-800 transition-colors font-noto text-[14px] font-medium"
-        >
-          시작하기
-        </button>
-        {/* Mobile menu toggle */}
-        <button
-          onClick={() => setMenuOpen((v) => !v)}
-          className="md:hidden flex items-center justify-center w-[42px] h-[42px] rounded-full hover:bg-black/5 transition-colors text-black"
-          aria-label={menuOpen ? '메뉴 닫기' : '메뉴 열기'}
-          aria-expanded={menuOpen}
-        >
-          {menuOpen ? <X size={22} /> : <Menu size={22} />}
-        </button>
+
+        {/* Desktop Menu */}
+        <div className="hidden items-center gap-8 justify-self-center font-noto text-[15px] font-medium tracking-tight text-gray-800 md:flex">
+          {MENU_ITEMS.map((item) => (
+            <Link key={item.label} href={item.href} className="transition-colors hover:text-black">
+              {item.label}
+            </Link>
+          ))}
+        </div>
+
+        {/* Action Buttons */}
+        <div className="col-start-3 flex items-center justify-self-end gap-2">
+          <Link href="/saved" className="hidden h-[42px] w-[110px] items-center justify-center rounded-full font-noto text-[14px] font-medium text-black transition-colors hover:bg-black/5 md:flex">
+            저장한 여행
+          </Link>
+          <button
+            onClick={onScrollToSearch}
+            className="flex h-[42px] w-auto items-center justify-center rounded-full bg-black px-6 font-noto text-[14px] font-medium text-white transition-colors hover:bg-gray-800 md:w-[101px]"
+          >
+            시작하기
+          </button>
+          <button
+            onClick={() => setMenuOpen((v) => !v)}
+            className="flex h-[42px] w-[42px] items-center justify-center rounded-full text-black transition-colors hover:bg-black/5 md:hidden"
+            aria-label={menuOpen ? '메뉴 닫기' : '메뉴 열기'}
+            aria-expanded={menuOpen}
+          >
+            {menuOpen ? <X size={22} /> : <Menu size={22} />}
+          </button>
+        </div>
       </div>
 
       {/* Mobile Menu Panel */}
       {menuOpen && (
-        <div className="md:hidden absolute top-full left-0 right-0 mx-5 mt-2 bg-white rounded-2xl shadow-xl border border-gray-100 overflow-hidden animate-fade-in">
+        <div className="absolute left-5 right-5 top-full mt-2 overflow-hidden rounded-2xl border border-gray-100 bg-white shadow-xl animate-fade-in md:hidden">
           <div className="flex flex-col py-2">
             {MENU_ITEMS.map((item) => (
               <Link
