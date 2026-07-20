@@ -40,7 +40,7 @@ export const ShareModal = ({ isOpen, onClose, shareTitle, onNotify }: ShareModal
   const handleKakao = async () => {
     const ok = await shareToKakao({
       title: shareTitle,
-      description: '헤도돼? — 여행 전 실수 방지 가이드',
+      description: '해도돼? — 여행 전 실수 방지 가이드',
       webUrl: getUrl(),
     });
     if (ok) onClose();

@@ -78,7 +78,7 @@ export const DestinationView = ({
       <header className="sticky top-0 z-40 bg-white/90 backdrop-blur-md border-b border-gray-200">
         <div className="max-w-[1200px] mx-auto px-5 md:px-[48px] lg:px-[120px] h-16 flex items-center justify-between">
           <Link href="/" className="font-noto font-bold text-xl tracking-[-1px] text-black">
-            헤도돼?
+            해도돼?
           </Link>
           <div className="flex items-center gap-3">
             <span className="hidden sm:flex items-center gap-1.5 text-[13px] font-noto font-medium text-gray-600">

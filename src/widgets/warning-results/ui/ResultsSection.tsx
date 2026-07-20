@@ -252,7 +252,7 @@ export const ResultsSection = ({
           <p className="font-noto text-[13px] text-gray-600 leading-relaxed">
             <strong>법률과 시설 규칙은 변경될 수 있습니다.</strong>
             <br />
-            헤도돼?는 확인되지 않은 지역 정보를 임의로 생성하지 않습니다. 실제 여행 전 공식 기관과 방문 시설의 최신 안내를
+            해도돼?는 확인되지 않은 지역 정보를 임의로 생성하지 않습니다. 실제 여행 전 공식 기관과 방문 시설의 최신 안내를
             반드시 확인하세요.
           </p>
         </div>

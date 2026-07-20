@@ -2,15 +2,15 @@ import type { Metadata } from 'next';
 import { LegalPage, type LegalSection } from '@/views/legal';
 
 export const metadata: Metadata = {
-  title: '개인정보처리방침 — 헤도돼?',
-  description: '헤도돼? 개인정보처리방침(초안).',
+  title: '개인정보처리방침 — 해도돼?',
+  description: '해도돼? 개인정보처리방침(초안).',
 };
 
 const SECTIONS: LegalSection[] = [
   {
     heading: '수집하는 정보',
     body: [
-      '헤도돼?는 회원가입 없이 이용할 수 있으며, 기본적으로 개인을 식별하는 정보를 수집하지 않습니다.',
+      '해도돼?는 회원가입 없이 이용할 수 있으며, 기본적으로 개인을 식별하는 정보를 수집하지 않습니다.',
       '저장(북마크) 기능은 이용자의 브라우저 로컬 저장소(localStorage)에만 보관되며, 서버로 전송되지 않습니다.',
     ],
   },

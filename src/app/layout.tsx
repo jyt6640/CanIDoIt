@@ -5,7 +5,7 @@ import './globals.css';
 
 export const metadata: Metadata = {
   metadataBase: new URL(env.siteUrl),
-  title: '헤도돼? — 여행자를 위한 실수 방지 가이드',
+  title: '해도돼? — 여행자를 위한 실수 방지 가이드',
   description:
     '나라와 도시만 입력하면 한국인 여행자가 현지에서 모르고 저지르기 쉬운 불법 행동, 시설 규칙, 문화적 금기와 일반 매너를 중요도순으로 알려드려요.',
 };
