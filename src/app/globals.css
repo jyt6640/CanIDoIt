@@ -1,0 +1,61 @@
+@import url('https://fonts.googleapis.com/css2?family=Fustat:wght@400..700&family=Inter:wght@400..700&family=Noto+Sans+KR:wght@400..700&family=Schibsted+Grotesk:ital,wght@0,400..900;1,400..900&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --color-black: #000000;
+  --color-dark-badge: #0e1311;
+  --color-gray-text: #505050;
+  --color-light-bg: #f8f8f8;
+  --color-white: #ffffff;
+  --color-green-accent: rgba(90, 225, 76, 0.89);
+  --color-glass: rgba(0, 0, 0, 0.24);
+
+  --color-risk-very-high: #b42318;
+  --color-risk-high: #c2410c;
+  --color-risk-medium: #57534e;
+  --color-risk-info: #e7e5e4;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  background-color: var(--color-light-bg);
+  color: var(--color-black);
+  font-family: 'Noto Sans KR', sans-serif;
+}
+
+.font-noto {
+  font-family: 'Noto Sans KR', sans-serif;
+}
+.font-schibsted {
+  font-family: 'Schibsted Grotesk', sans-serif;
+}
+.font-inter {
+  font-family: 'Inter', sans-serif;
+}
+.font-fustat {
+  font-family: 'Fustat', sans-serif;
+}
+
+/* Hide scrollbar for horizontal scrolling elements */
+.hide-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.hide-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+/* Modal open state */
+body.modal-open {
+  overflow: hidden;
+}
+
+.pb-safe {
+  padding-bottom: env(safe-area-inset-bottom);
+}

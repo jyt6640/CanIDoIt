@@ -1,0 +1,64 @@
+import { Bookmark, BookmarkCheck, ArrowRight } from 'lucide-react';
+import { getRiskStyles } from '@/shared/lib/risk';
+import type { Warning } from '../model/types';
+
+interface WarningCardProps {
+  item: Warning;
+  isSaved: boolean;
+  onToggleSave: (id: number) => void;
+  onClick: (item: Warning) => void;
+}
+
+export const WarningCard = ({ item, isSaved, onToggleSave, onClick }: WarningCardProps) => {
+  const styles = getRiskStyles(item.risk);
+  const RiskIcon = styles.icon;
+
+  return (
+    <div
+      onClick={() => onClick(item)}
+      className="bg-white rounded-[16px] p-5 md:p-6 border border-gray-100 shadow-[0_4px_20px_rgba(0,0,0,0.03)] hover:shadow-[0_8px_30px_rgba(0,0,0,0.08)] hover:-translate-y-1 transition-all cursor-pointer group relative flex flex-col h-full"
+    >
+      <div className="flex justify-between items-start mb-4">
+        <div className="flex gap-2 items-center">
+          <span
+            className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-md font-noto text-[11px] font-bold tracking-tight ${styles.bg} ${styles.text} ${styles.border} border`}
+          >
+            <RiskIcon size={12} strokeWidth={2.5} />
+            {item.risk}
+          </span>
+          <span className="text-gray-500 font-noto text-[12px] font-medium bg-gray-50 px-2 py-1 rounded-md">
+            {item.category}
+          </span>
+        </div>
+        <button
+          onClick={(e) => {
+            e.stopPropagation();
+            onToggleSave(item.id);
+          }}
+          className="p-1.5 rounded-full hover:bg-gray-100 transition-colors -mr-1.5 -mt-1.5 text-gray-400 hover:text-black focus:outline-none"
+          aria-label={isSaved ? '저장 취소' : '저장하기'}
+        >
+          {isSaved ? <BookmarkCheck size={20} className="text-black fill-black" /> : <Bookmark size={20} />}
+        </button>
+      </div>
+
+      <h3 className="font-noto font-bold text-[17px] md:text-[19px] leading-[1.4] text-black mb-3 group-hover:text-gray-700 transition-colors line-clamp-2">
+        {item.title}
+      </h3>
+
+      <p className="font-noto text-[14px] text-gray-600 leading-[1.5] mb-5 line-clamp-2 flex-grow">
+        {item.reason || item.alternative}
+      </p>
+
+      <div className="pt-4 border-t border-gray-100 mt-auto flex justify-between items-center">
+        <div className="flex flex-col gap-0.5">
+          <span className="text-[11px] font-noto text-gray-400">적용 범위</span>
+          <span className="text-[12px] font-noto font-medium text-gray-800">{item.range}</span>
+        </div>
+        <div className="w-8 h-8 rounded-full bg-gray-50 flex items-center justify-center group-hover:bg-black group-hover:text-white transition-colors">
+          <ArrowRight size={16} />
+        </div>
+      </div>
+    </div>
+  );
+};

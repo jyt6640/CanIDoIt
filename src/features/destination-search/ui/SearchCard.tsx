@@ -1,0 +1,160 @@
+'use client';
+
+import { ChevronDown, ArrowUpRight, MapPin, Search, CheckCircle2 } from 'lucide-react';
+import { DESTINATION_DATA } from '@/shared/config/destinations';
+
+interface SearchCardProps {
+  selectedCountry: string;
+  setSelectedCountry: (value: string) => void;
+  selectedCity: string;
+  setSelectedCity: (value: string) => void;
+  onSearch: (country: string, city: string) => void;
+  isSearching: boolean;
+}
+
+export const SearchCard = ({
+  selectedCountry,
+  setSelectedCountry,
+  selectedCity,
+  setSelectedCity,
+  onSearch,
+  isSearching,
+}: SearchCardProps) => {
+  const handleQuickSelect = (country: string, city: string) => {
+    setSelectedCountry(country);
+    setSelectedCity(city);
+    setTimeout(() => {
+      onSearch(country, city);
+    }, 50);
+  };
+
+  const isSubmitDisabled = !selectedCountry;
+
+  return (
+    <div className="w-full max-w-[760px] mx-auto bg-black/24 backdrop-blur-xl border border-white/20 rounded-[20px] p-[14px] shadow-2xl">
+      {/* Top Info Row */}
+      <div className="flex justify-between items-center px-2 mb-3">
+        <div className="flex items-center gap-2">
+          <span className="text-white font-noto font-medium text-[13px]">한국인 여행자 기준</span>
+          <span className="bg-[#5ae14c]/90 text-black font-inter font-bold text-[10px] px-2 py-0.5 rounded uppercase tracking-wide">
+            Beta
+          </span>
+        </div>
+        <div className="flex items-center gap-1 text-white/90">
+          <CheckCircle2 size={12} />
+          <span className="font-noto font-medium text-[12px]">출처 기반 주의사항</span>
+        </div>
+      </div>
+
+      {/* Main Input Area */}
+      <div className="bg-white rounded-[14px] p-4 shadow-inner flex flex-col md:flex-row gap-4 items-center relative">
+        {/* Country Field */}
+        <div className="w-full md:flex-1 relative">
+          <label className="block text-[11px] font-noto text-gray-500 font-semibold mb-1 ml-1">나라</label>
+          <div className="relative">
+            <select
+              className="w-full appearance-none bg-gray-50 border border-gray-200 rounded-lg py-3 px-4 text-black font-noto font-medium focus:outline-none focus:ring-2 focus:ring-black/20 focus:border-black/30 transition-all text-[15px]"
+              value={selectedCountry}
+              onChange={(e) => {
+                setSelectedCountry(e.target.value);
+                setSelectedCity('');
+              }}
+            >
+              <option value="" disabled>
+                여행할 나라를 선택하세요
+              </option>
+              {Object.keys(DESTINATION_DATA).map((country) => (
+                <option key={country} value={country}>
+                  {country}
+                </option>
+              ))}
+            </select>
+            <ChevronDown size={18} className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" />
+          </div>
+        </div>
+
+        {/* Divider (Desktop) */}
+        <div className="hidden md:block w-[1px] h-10 bg-gray-200 mt-5"></div>
+
+        {/* City Field */}
+        <div className="w-full md:flex-1 relative">
+          <label className="block text-[11px] font-noto text-gray-500 font-semibold mb-1 ml-1">도시</label>
+          <div className="relative">
+            <select
+              className="w-full appearance-none bg-gray-50 border border-gray-200 rounded-lg py-3 px-4 text-black font-noto font-medium focus:outline-none focus:ring-2 focus:ring-black/20 focus:border-black/30 transition-all text-[15px] disabled:opacity-50 disabled:bg-gray-100"
+              value={selectedCity}
+              onChange={(e) => setSelectedCity(e.target.value)}
+              disabled={!selectedCountry}
+            >
+              <option value="">도시는 선택사항입니다</option>
+              {selectedCountry &&
+                DESTINATION_DATA[selectedCountry].map((city) => (
+                  <option key={city} value={city}>
+                    {city}
+                  </option>
+                ))}
+            </select>
+            <ChevronDown size={18} className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" />
+          </div>
+        </div>
+
+        {/* Submit Button */}
+        <button
+          onClick={() => onSearch(selectedCountry, selectedCity)}
+          disabled={isSubmitDisabled || isSearching}
+          aria-label="주의사항 확인하기"
+          className={`w-full md:w-[44px] h-[44px] rounded-full flex items-center justify-center transition-all mt-4 md:mt-5 ${
+            isSubmitDisabled
+              ? 'bg-gray-200 text-gray-400 cursor-not-allowed'
+              : 'bg-black text-white hover:scale-105 hover:bg-gray-800 shadow-lg'
+          }`}
+        >
+          {isSearching ? (
+            <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
+          ) : (
+            <>
+              <span className="md:hidden font-noto font-medium mr-2">주의사항 확인하기</span>
+              <ArrowUpRight size={20} className="hidden md:block" />
+            </>
+          )}
+        </button>
+      </div>
+
+      {/* Loading Text Overlay */}
+      {isSearching && (
+        <div className="absolute inset-0 bg-white/80 backdrop-blur-sm rounded-[14px] flex items-center justify-center z-10 m-[14px] top-8">
+          <p className="font-noto font-medium text-black animate-pulse flex items-center gap-2">
+            <Search size={16} /> 여행지 주의사항을 정리하고 있어요
+          </p>
+        </div>
+      )}
+
+      {/* Bottom Row */}
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center mt-3 px-2 gap-3 md:gap-0">
+        <div className="flex flex-wrap gap-2">
+          <button
+            onClick={() => handleQuickSelect('일본', '오사카')}
+            className="flex items-center gap-1.5 bg-white/20 hover:bg-white/30 backdrop-blur-sm px-3 py-1.5 rounded-[7px] text-white font-noto text-[12px] transition-colors border border-white/10"
+          >
+            <MapPin size={12} /> 일본 · 오사카
+          </button>
+          <button
+            onClick={() => handleQuickSelect('태국', '방콕')}
+            className="flex items-center gap-1.5 bg-white/20 hover:bg-white/30 backdrop-blur-sm px-3 py-1.5 rounded-[7px] text-white font-noto text-[12px] transition-colors border border-white/10"
+          >
+            <MapPin size={12} /> 태국 · 방콕
+          </button>
+          <button
+            onClick={() => handleQuickSelect('싱가포르', '싱가포르')}
+            className="flex items-center gap-1.5 bg-white/20 hover:bg-white/30 backdrop-blur-sm px-3 py-1.5 rounded-[7px] text-white font-noto text-[12px] transition-colors border border-white/10"
+          >
+            <MapPin size={12} /> 싱가포르
+          </button>
+        </div>
+        <p className="text-white/80 font-noto text-[11px] md:text-[12px]">
+          도시를 입력하지 않으면 국가 공통 정보를 보여드려요.
+        </p>
+      </div>
+    </div>
+  );
+};
