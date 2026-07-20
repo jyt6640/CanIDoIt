@@ -1,22 +1,25 @@
 -- CreateTable
 CREATE TABLE "Country" (
-    "id" TEXT NOT NULL PRIMARY KEY,
+    "id" TEXT NOT NULL,
     "name" TEXT NOT NULL,
-    "slug" TEXT NOT NULL
+    "slug" TEXT NOT NULL,
+
+    CONSTRAINT "Country_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
 CREATE TABLE "City" (
-    "id" TEXT NOT NULL PRIMARY KEY,
+    "id" TEXT NOT NULL,
     "name" TEXT NOT NULL,
     "slug" TEXT NOT NULL,
     "countryId" TEXT NOT NULL,
-    CONSTRAINT "City_countryId_fkey" FOREIGN KEY ("countryId") REFERENCES "Country" ("id") ON DELETE CASCADE ON UPDATE CASCADE
+
+    CONSTRAINT "City_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
 CREATE TABLE "Warning" (
-    "id" TEXT NOT NULL PRIMARY KEY,
+    "id" TEXT NOT NULL,
     "title" TEXT NOT NULL,
     "category" TEXT NOT NULL,
     "risk" TEXT NOT NULL,
@@ -30,20 +33,21 @@ CREATE TABLE "Warning" (
     "order" INTEGER NOT NULL DEFAULT 0,
     "countryId" TEXT NOT NULL,
     "cityId" TEXT,
-    "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "updatedAt" DATETIME NOT NULL,
-    CONSTRAINT "Warning_countryId_fkey" FOREIGN KEY ("countryId") REFERENCES "Country" ("id") ON DELETE CASCADE ON UPDATE CASCADE,
-    CONSTRAINT "Warning_cityId_fkey" FOREIGN KEY ("cityId") REFERENCES "City" ("id") ON DELETE CASCADE ON UPDATE CASCADE
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
+
+    CONSTRAINT "Warning_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
 CREATE TABLE "Source" (
-    "id" TEXT NOT NULL PRIMARY KEY,
+    "id" TEXT NOT NULL,
     "title" TEXT NOT NULL,
     "url" TEXT,
-    "checkedAt" DATETIME,
+    "checkedAt" TIMESTAMP(3),
     "warningId" TEXT NOT NULL,
-    CONSTRAINT "Source_warningId_fkey" FOREIGN KEY ("warningId") REFERENCES "Warning" ("id") ON DELETE CASCADE ON UPDATE CASCADE
+
+    CONSTRAINT "Source_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateIndex
@@ -60,3 +64,15 @@ CREATE INDEX "Warning_countryId_idx" ON "Warning"("countryId");
 
 -- CreateIndex
 CREATE INDEX "Warning_cityId_idx" ON "Warning"("cityId");
+
+-- AddForeignKey
+ALTER TABLE "City" ADD CONSTRAINT "City_countryId_fkey" FOREIGN KEY ("countryId") REFERENCES "Country"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "Warning" ADD CONSTRAINT "Warning_countryId_fkey" FOREIGN KEY ("countryId") REFERENCES "Country"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "Warning" ADD CONSTRAINT "Warning_cityId_fkey" FOREIGN KEY ("cityId") REFERENCES "City"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "Source" ADD CONSTRAINT "Source_warningId_fkey" FOREIGN KEY ("warningId") REFERENCES "Warning"("id") ON DELETE CASCADE ON UPDATE CASCADE;
