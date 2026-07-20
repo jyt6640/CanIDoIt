@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { X, Copy, Check, MessageCircle } from 'lucide-react';
 import { copyToClipboard } from '@/shared/lib/clipboard';
 import { isKakaoShareEnabled, shareToKakao } from '@/shared/lib/kakao';
+import { useModalA11y } from '@/shared/lib/useModalA11y';
 
 interface ShareModalProps {
   isOpen: boolean;
@@ -17,6 +18,7 @@ interface ShareModalProps {
 export const ShareModal = ({ isOpen, onClose, shareTitle, onNotify }: ShareModalProps) => {
   const [copied, setCopied] = useState(false);
   const kakaoEnabled = isKakaoShareEnabled();
+  const dialogRef = useModalA11y<HTMLDivElement>(isOpen, onClose);
 
   if (!isOpen) return null;
 
@@ -46,7 +48,13 @@ export const ShareModal = ({ isOpen, onClose, shareTitle, onNotify }: ShareModal
   return (
     <div className="fixed inset-0 z-[60] flex items-center justify-center p-4">
       <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" onClick={onClose} />
-      <div className="relative w-full max-w-[360px] bg-white rounded-[20px] p-6 shadow-2xl animate-zoom-in">
+      <div
+        ref={dialogRef}
+        role="dialog"
+        aria-modal="true"
+        aria-label="공유"
+        className="relative w-full max-w-[360px] bg-white rounded-[20px] p-6 shadow-2xl animate-zoom-in"
+      >
         <button onClick={onClose} className="absolute top-4 right-4 text-gray-400 hover:text-gray-800" aria-label="닫기">
           <X size={20} />
         </button>

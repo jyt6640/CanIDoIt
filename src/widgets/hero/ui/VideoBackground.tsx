@@ -2,6 +2,7 @@
 
 import { useEffect, useRef } from 'react';
 import { env } from '@/shared/config/env';
+import { usePrefersReducedMotion } from '@/shared/lib/usePrefersReducedMotion';
 
 const VIDEO_SRC = env.heroVideoUrl;
 
@@ -9,10 +10,18 @@ export const VideoBackground = () => {
   const videoRef = useRef<HTMLVideoElement>(null);
   const fadeFrameRef = useRef<number | null>(null);
   const fadingOutRef = useRef(false);
+  const reducedMotion = usePrefersReducedMotion();
 
   useEffect(() => {
     const video = videoRef.current;
     if (!video) return;
+
+    // 모션 최소화: 재생/페이드 없이 첫 프레임을 정적으로 노출
+    if (reducedMotion) {
+      video.style.opacity = '1';
+      video.pause();
+      return;
+    }
 
     const DURATION = 250; // Fade duration in ms
     const THRESHOLD = 0.55; // Time from end to start fade out
@@ -81,7 +90,7 @@ export const VideoBackground = () => {
       video.removeEventListener('timeupdate', handleTimeUpdate);
       video.removeEventListener('ended', handleEnded);
     };
-  }, []);
+  }, [reducedMotion]);
 
   return (
     <div className="absolute inset-0 w-full h-full overflow-hidden bg-black z-0">
@@ -90,10 +99,12 @@ export const VideoBackground = () => {
         <video
           ref={videoRef}
           src={VIDEO_SRC}
+          poster={env.heroPosterUrl || undefined}
           className="absolute top-0 left-1/2 -translate-x-1/2 w-[115%] h-[115%] object-cover"
-          style={{ objectPosition: 'center top', opacity: 0 }}
+          style={{ objectPosition: 'center top', opacity: reducedMotion ? 1 : 0 }}
           muted
           playsInline
+          preload={reducedMotion ? 'metadata' : 'auto'}
         />
       )}
       {/* Gradient Overlay for text readability */}

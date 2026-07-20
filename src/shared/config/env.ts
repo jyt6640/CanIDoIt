@@ -8,6 +8,8 @@
 export const env = {
   /** 히어로 배경 비디오 URL (없으면 비디오 없이 배경만 렌더) */
   heroVideoUrl: process.env.NEXT_PUBLIC_HERO_VIDEO_URL ?? '',
+  /** 히어로 비디오 poster 이미지 URL (로딩 전/모션 최소화 시 폴백) */
+  heroPosterUrl: process.env.NEXT_PUBLIC_HERO_POSTER_URL ?? '',
   /** 사이트 기준 URL (메타데이터 canonical, 공유 링크 생성 등) */
   siteUrl: process.env.NEXT_PUBLIC_SITE_URL ?? 'http://localhost:3000',
   /** 카카오 JavaScript 앱 키 (없으면 카카오 공유 버튼 비활성) */
