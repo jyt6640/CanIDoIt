@@ -12,6 +12,7 @@ export interface DestinationWarnings {
 
 type PrismaWarning = {
   id: string;
+  key: string;
   title: string;
   category: string;
   risk: string;
@@ -35,7 +36,7 @@ function toWarning(w: PrismaWarning): Warning {
   }
 
   return {
-    id: w.id,
+    id: w.key,
     title: w.title,
     category: w.category,
     risk: w.risk,
@@ -93,6 +94,7 @@ export const getDestinationWarnings = cache(async (
   const warnings = await prisma.warning.findMany({
     where: {
       countryId: country.id,
+      archived: false,
       // 도시 지정 시: 국가 공통(cityId null) + 해당 도시. 미지정 시: 국가 공통만.
       ...(city ? { OR: [{ cityId: null }, { cityId: city.id }] } : { cityId: null }),
     },
