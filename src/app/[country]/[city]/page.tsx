@@ -32,6 +32,8 @@ export default async function CityPage({ params }: PageProps) {
 
   return (
     <DestinationView
+      countrySlug={country}
+      citySlug={city}
       warnings={data.warnings}
       countryName={data.country.name}
       cityName={data.city?.name ?? null}

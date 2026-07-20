@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import Link from 'next/link';
 import { MapPin, Search } from 'lucide-react';
 import type { Warning } from '@/entities/warning';
@@ -12,14 +12,23 @@ import { Footer } from '@/widgets/footer';
 import { Toast } from '@/shared/ui/Toast';
 import { useToast } from '@/shared/lib/useToast';
 import { useBodyScrollLock } from '@/shared/lib/useBodyScrollLock';
+import { track } from '@/shared/lib/analytics';
 
 interface DestinationViewProps {
+  countrySlug: string;
+  citySlug: string | null;
   warnings: Warning[];
   countryName: string;
   cityName: string | null;
 }
 
-export const DestinationView = ({ warnings, countryName, cityName }: DestinationViewProps) => {
+export const DestinationView = ({
+  countrySlug,
+  citySlug,
+  warnings,
+  countryName,
+  cityName,
+}: DestinationViewProps) => {
   const { savedItems, toggleSave } = useSavedItems();
   const [selectedWarning, setSelectedWarning] = useState<Warning | null>(null);
   const [isShareModalOpen, setIsShareModalOpen] = useState(false);
@@ -27,9 +36,38 @@ export const DestinationView = ({ warnings, countryName, cityName }: Destination
 
   useBodyScrollLock(!!selectedWarning || isShareModalOpen);
 
+  useEffect(() => {
+    track('view_destination', {
+      country: countrySlug,
+      city: citySlug ?? undefined,
+      count: warnings.length,
+    });
+  }, [countrySlug, citySlug, warnings.length]);
+
+  const handleToggleSave = useCallback(
+    (id: string) => {
+      toggleSave(id);
+      track('save_toggle', { id, saved: !savedItems.has(id) });
+    },
+    [toggleSave, savedItems],
+  );
+
+  const handleOpenWarning = useCallback((item: Warning) => {
+    setSelectedWarning(item);
+    track('open_warning', { id: item.id });
+  }, []);
+
+  const handleOpenShare = useCallback(() => {
+    setIsShareModalOpen(true);
+    track('share_open', {});
+  }, []);
+
   const handleShareFromDetail = useCallback(() => {
     setSelectedWarning(null);
-    setTimeout(() => setIsShareModalOpen(true), 300);
+    setTimeout(() => {
+      setIsShareModalOpen(true);
+      track('share_open', {});
+    }, 300);
   }, []);
 
   const displayLocation = cityName ? `${countryName} · ${cityName}` : countryName;
@@ -61,9 +99,9 @@ export const DestinationView = ({ warnings, countryName, cityName }: Destination
         countryName={countryName}
         cityName={cityName}
         savedItems={savedItems}
-        onToggleSave={toggleSave}
-        onOpenWarning={setSelectedWarning}
-        onOpenShare={() => setIsShareModalOpen(true)}
+        onToggleSave={handleToggleSave}
+        onOpenWarning={handleOpenWarning}
+        onOpenShare={handleOpenShare}
       />
 
       <WarningDetailModal
@@ -71,7 +109,7 @@ export const DestinationView = ({ warnings, countryName, cityName }: Destination
         isOpen={!!selectedWarning}
         onClose={() => setSelectedWarning(null)}
         isSaved={selectedWarning ? savedItems.has(selectedWarning.id) : false}
-        onToggleSave={toggleSave}
+        onToggleSave={handleToggleSave}
         onShare={handleShareFromDetail}
       />
 

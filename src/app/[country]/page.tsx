@@ -30,5 +30,13 @@ export default async function CountryPage({ params }: PageProps) {
   const data = await getDestinationWarnings(country);
   if (!data) notFound();
 
-  return <DestinationView warnings={data.warnings} countryName={data.country.name} cityName={null} />;
+  return (
+    <DestinationView
+      countrySlug={country}
+      citySlug={null}
+      warnings={data.warnings}
+      countryName={data.country.name}
+      cityName={null}
+    />
+  );
 }
