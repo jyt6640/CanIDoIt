@@ -10,6 +10,14 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+enum WarningStatus {
+  DRAFT
+  REVIEWING
+  VERIFIED
+  STALE
+  ARCHIVED
+}
+
 model Country {
   id       String    @id @default(cuid())
   name     String    @unique // 표시명 (예: 일본)
@@ -33,6 +41,11 @@ model Warning {
   id            String   @id @default(cuid())
   key           String   @unique
   archived      Boolean  @default(false)
+  status        WarningStatus @default(DRAFT)
+  verifiedAt    DateTime?
+  expiresAt     DateTime?
+  reviewedBy    String?
+  confidence    Int?
   title         String
   category      String
   risk          String // 매우 높음 | 높음 | 보통 | 참고
@@ -58,6 +71,7 @@ model Warning {
   @@index([countryId])
   @@index([cityId])
   @@index([archived])
+  @@index([status])
 }
 
 // 출처 — "출처 기반" 신뢰 문구의 실체 (#3)

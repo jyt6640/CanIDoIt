@@ -17,4 +17,9 @@ export interface Warning {
   checkNeeded?: string | null;
   locations: string[];
   sources?: WarningSource[];
+  status?: 'DRAFT' | 'REVIEWING' | 'VERIFIED' | 'STALE' | 'ARCHIVED';
+  verifiedAt?: string | null;
+  expiresAt?: string | null;
+  reviewedBy?: string | null;
+  confidence?: number | null;
 }

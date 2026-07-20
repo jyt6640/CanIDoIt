@@ -36,6 +36,14 @@ export const WarningDetailModal = ({
   if (!isOpen || !item) return null;
   const styles = getRiskStyles(item.risk);
   const RiskIcon = styles.icon;
+  const verificationLabel = item.status === 'VERIFIED'
+    ? '공식 출처 확인됨'
+    : item.status === 'STALE'
+      ? '재검토 필요'
+      : '출처 확인 중';
+  const verifiedDate = item.verifiedAt
+    ? new Intl.DateTimeFormat('ko-KR', { dateStyle: 'medium' }).format(new Date(item.verifiedAt))
+    : null;
 
   return (
     <div className="fixed inset-0 z-50 flex items-end md:items-center justify-center p-0 md:p-4 animate-fade-in">
@@ -77,6 +85,22 @@ export const WarningDetailModal = ({
           </div>
 
           <div className="space-y-6">
+            <div className="rounded-[16px] border border-gray-200 bg-white p-4">
+              <div className="flex items-center justify-between gap-3">
+                <span className="font-noto text-[13px] font-bold text-gray-900">{verificationLabel}</span>
+                {item.confidence != null && (
+                  <span className="font-noto text-[12px] text-gray-500">신뢰도 {item.confidence}%</span>
+                )}
+              </div>
+              <p className="mt-1 font-noto text-[12px] text-gray-500">
+                {verifiedDate ? `최종 확인: ${verifiedDate}` : '최종 확인일을 검토 중입니다.'}
+              </p>
+              {item.status === 'STALE' && (
+                <p className="mt-2 font-noto text-[12px] font-medium text-amber-700">
+                  확인 주기가 지나 최신 공식 안내를 다시 확인해야 합니다.
+                </p>
+              )}
+            </div>
             <div className="bg-gray-50 rounded-[16px] p-5">
               <h4 className="font-noto text-[14px] font-bold text-gray-800 mb-2 flex items-center gap-1.5">
                 <AlertCircle size={16} /> 왜 조심해야 하나요?
