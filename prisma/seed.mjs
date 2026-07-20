@@ -1,6 +1,7 @@
 // 해도돼? 시드 데이터
 // 국가/도시/주의사항/출처를 삽입한다. 멱등하도록 매 실행 시 초기화 후 재삽입.
 import { PrismaClient } from '@prisma/client';
+import { OFFICIAL_EXPANSION } from './seed-data/official-expansion.mjs';
 
 const prisma = new PrismaClient();
 
@@ -681,6 +682,7 @@ const DATA = [
       },
     ],
   },
+  ...OFFICIAL_EXPANSION,
 ];
 
 async function main() {
@@ -707,7 +709,7 @@ async function main() {
 
     let order = 0;
     for (const w of c.warnings) {
-      const key = `${c.slug}-${w.city ?? 'common'}-${String(order + 1).padStart(3, '0')}`;
+      const key = w.key ?? `${c.slug}-${w.city ?? 'common'}-${String(order + 1).padStart(3, '0')}`;
       const warningData = {
           title: w.title,
           category: w.category,
