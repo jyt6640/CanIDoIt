@@ -14,16 +14,17 @@ interface ShareModalProps {
   shareTitle: string;
   /** 토스트 표시용 콜백 */
   onNotify: (message: string) => void;
+  shareUrl?: string;
 }
 
-export const ShareModal = ({ isOpen, onClose, shareTitle, onNotify }: ShareModalProps) => {
+export const ShareModal = ({ isOpen, onClose, shareTitle, onNotify, shareUrl }: ShareModalProps) => {
   const [copied, setCopied] = useState(false);
   const kakaoEnabled = isKakaoShareEnabled();
   const dialogRef = useModalA11y<HTMLDivElement>(isOpen, onClose);
 
   if (!isOpen) return null;
 
-  const getUrl = () => (typeof window !== 'undefined' ? window.location.href : '');
+  const getUrl = () => shareUrl ?? (typeof window !== 'undefined' ? window.location.href : '');
 
   const handleCopy = async () => {
     const ok = await copyToClipboard(getUrl());

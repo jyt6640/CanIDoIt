@@ -32,6 +32,7 @@ export const DestinationView = ({
   const { savedItems, toggleSave } = useSavedItems();
   const [selectedWarning, setSelectedWarning] = useState<Warning | null>(null);
   const [isShareModalOpen, setIsShareModalOpen] = useState(false);
+  const [shareTarget, setShareTarget] = useState<{ title: string; url: string } | null>(null);
   const { toast, showToast } = useToast();
 
   useBodyScrollLock(!!selectedWarning || isShareModalOpen);
@@ -44,6 +45,15 @@ export const DestinationView = ({
     });
   }, [countrySlug, citySlug, warnings.length]);
 
+  useEffect(() => {
+    const key = new URLSearchParams(window.location.search).get('warning');
+    if (!key) return;
+    const warning = warnings.find((item) => item.id === key);
+    if (!warning) return;
+    const timer = window.setTimeout(() => setSelectedWarning(warning), 0);
+    return () => window.clearTimeout(timer);
+  }, [warnings]);
+
   const handleToggleSave = useCallback(
     (id: string) => {
       toggleSave(id);
@@ -54,20 +64,34 @@ export const DestinationView = ({
 
   const handleOpenWarning = useCallback((item: Warning) => {
     setSelectedWarning(item);
+    const url = new URL(window.location.href);
+    url.searchParams.set('warning', item.id);
+    window.history.replaceState(null, '', url);
     track('open_warning', { id: item.id });
   }, []);
 
   const handleOpenShare = useCallback(() => {
+    setShareTarget(null);
     setIsShareModalOpen(true);
     track('share_open', {});
   }, []);
 
-  const handleShareFromDetail = useCallback(() => {
+  const handleShareFromDetail = useCallback((item: Warning) => {
+    const url = new URL(window.location.href);
+    url.searchParams.set('warning', item.id);
+    setShareTarget({ title: item.title, url: url.toString() });
     setSelectedWarning(null);
     setTimeout(() => {
       setIsShareModalOpen(true);
       track('share_open', {});
     }, 300);
+  }, []);
+
+  const handleCloseWarning = useCallback(() => {
+    setSelectedWarning(null);
+    const url = new URL(window.location.href);
+    url.searchParams.delete('warning');
+    window.history.replaceState(null, '', url);
   }, []);
 
   const displayLocation = cityName ? `${countryName} · ${cityName}` : countryName;
@@ -107,7 +131,7 @@ export const DestinationView = ({
       <WarningDetailModal
         item={selectedWarning}
         isOpen={!!selectedWarning}
-        onClose={() => setSelectedWarning(null)}
+        onClose={handleCloseWarning}
         isSaved={selectedWarning ? savedItems.has(selectedWarning.id) : false}
         onToggleSave={handleToggleSave}
         onShare={handleShareFromDetail}
@@ -116,7 +140,8 @@ export const DestinationView = ({
       <ShareModal
         isOpen={isShareModalOpen}
         onClose={() => setIsShareModalOpen(false)}
-        shareTitle={`${displayLocation}에서 조심할 행동`}
+        shareTitle={shareTarget?.title ?? `${displayLocation}에서 조심할 행동`}
+        shareUrl={shareTarget?.url}
         onNotify={showToast}
       />
 

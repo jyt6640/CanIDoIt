@@ -1,10 +1,12 @@
 'use client';
 
 import Link from 'next/link';
-import { Bookmark, Trash2 } from 'lucide-react';
+import { useSearchParams } from 'next/navigation';
+import { Bookmark, Share2, Trash2 } from 'lucide-react';
 import type { SavedWarningRecord } from '@/entities/warning/api/warningRepository';
 import { WarningCard } from '@/entities/warning';
 import { useSavedItems } from '@/features/warning-save';
+import { copyToClipboard } from '@/shared/lib/clipboard';
 
 interface SavedTripsViewProps {
   records: SavedWarningRecord[];
@@ -12,7 +14,11 @@ interface SavedTripsViewProps {
 
 export const SavedTripsView = ({ records }: SavedTripsViewProps) => {
   const { savedItems, toggleSave } = useSavedItems();
-  const saved = records.filter(({ warning }) => savedItems.has(warning.id));
+  const searchParams = useSearchParams();
+  const sharedIds = new Set((searchParams.get('items') ?? '').split(',').filter(Boolean));
+  const isSharedView = sharedIds.size > 0;
+  const visibleIds = isSharedView ? sharedIds : savedItems;
+  const saved = records.filter(({ warning }) => visibleIds.has(warning.id));
   const grouped = Map.groupBy(saved, ({ country, city }) => `${country.name}|${city?.name ?? '국가 공통'}`);
 
   return (
@@ -29,8 +35,23 @@ export const SavedTripsView = ({ records }: SavedTripsViewProps) => {
           <div>
             <p className="text-sm font-bold text-gray-500">SAVED TRIPS</p>
             <h1 className="mt-2 text-3xl font-bold md:text-4xl">저장한 여행</h1>
-            <p className="mt-3 text-gray-600">총 {saved.length}개의 주의사항을 저장했어요.</p>
+            <p className="mt-3 text-gray-600">
+              {isSharedView ? `공유받은 주의사항 ${saved.length}개예요.` : `총 ${saved.length}개의 주의사항을 저장했어요.`}
+            </p>
           </div>
+          {!isSharedView && saved.length > 0 && (
+            <button
+              type="button"
+              onClick={() => {
+                const url = new URL('/saved', window.location.origin);
+                url.searchParams.set('items', saved.map(({ warning }) => warning.id).join(','));
+                void copyToClipboard(url.toString());
+              }}
+              className="flex items-center gap-2 rounded-full bg-black px-5 py-3 text-sm font-medium text-white"
+            >
+              <Share2 size={16} /> 목록 공유
+            </button>
+          )}
         </div>
 
         {saved.length === 0 ? (
@@ -55,14 +76,14 @@ export const SavedTripsView = ({ records }: SavedTripsViewProps) => {
                           onToggleSave={toggleSave}
                           onClick={() => undefined}
                         />
-                        <button
+                        {!isSharedView && <button
                           type="button"
                           onClick={() => toggleSave(warning.id)}
                           className="absolute bottom-4 right-4 rounded-full bg-white p-2 text-gray-500 shadow"
                           aria-label="저장 취소"
                         >
                           <Trash2 size={16} />
-                        </button>
+                        </button>}
                       </div>
                     ))}
                   </div>
