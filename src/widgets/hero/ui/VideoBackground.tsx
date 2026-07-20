@@ -9,7 +9,6 @@ const VIDEO_SRC = env.heroVideoUrl;
 export const VideoBackground = () => {
   const videoRef = useRef<HTMLVideoElement>(null);
   const fadeFrameRef = useRef<number | null>(null);
-  const fadingOutRef = useRef(false);
   const reducedMotion = usePrefersReducedMotion();
 
   useEffect(() => {
@@ -23,8 +22,7 @@ export const VideoBackground = () => {
       return;
     }
 
-    const DURATION = 250; // Fade duration in ms
-    const THRESHOLD = 0.55; // Time from end to start fade out
+    const DURATION = 250;
 
     const animateFade = (startOpacity: number, targetOpacity: number, startTime: number) => {
       const updateFade = (currentTime: number) => {
@@ -47,48 +45,36 @@ export const VideoBackground = () => {
       fadeFrameRef.current = requestAnimationFrame(updateFade);
     };
 
-    const handleLoadedData = () => {
+    const revealVideo = () => {
       video.style.opacity = '0';
       animateFade(0, 1, performance.now());
     };
 
-    const handleTimeUpdate = () => {
-      const timeLeft = video.duration - video.currentTime;
-      if (timeLeft <= THRESHOLD && !fadingOutRef.current && video.duration > 0) {
-        fadingOutRef.current = true;
-        const currentOpacity = parseFloat(video.style.opacity || '1');
-        animateFade(currentOpacity, 0, performance.now());
+    const startPlayback = async () => {
+      try {
+        await video.play();
+        revealVideo();
+      } catch (error) {
+        console.warn('Hero video autoplay was blocked.', error);
+        video.style.opacity = '1';
       }
     };
 
-    const handleEnded = () => {
-      video.style.opacity = '0';
-      setTimeout(() => {
-        video.currentTime = 0;
-        fadingOutRef.current = false;
+    if (video.readyState >= HTMLMediaElement.HAVE_CURRENT_DATA) {
+      void startPlayback();
+    } else {
+      video.addEventListener('canplay', startPlayback, { once: true });
+    }
 
-        const playPromise = video.play();
-        if (playPromise !== undefined) {
-          playPromise
-            .then(() => {
-              animateFade(0, 1, performance.now());
-            })
-            .catch((err) => console.error('Video play failed:', err));
-        }
-      }, 100);
+    const resumeOnVisibility = () => {
+      if (document.visibilityState === 'visible' && video.paused) void startPlayback();
     };
-
-    video.addEventListener('loadeddata', handleLoadedData);
-    video.addEventListener('timeupdate', handleTimeUpdate);
-    video.addEventListener('ended', handleEnded);
-
-    video.play().catch((e) => console.log('Auto-play blocked:', e));
+    document.addEventListener('visibilitychange', resumeOnVisibility);
 
     return () => {
       if (fadeFrameRef.current) cancelAnimationFrame(fadeFrameRef.current);
-      video.removeEventListener('loadeddata', handleLoadedData);
-      video.removeEventListener('timeupdate', handleTimeUpdate);
-      video.removeEventListener('ended', handleEnded);
+      video.removeEventListener('canplay', startPlayback);
+      document.removeEventListener('visibilitychange', resumeOnVisibility);
     };
   }, [reducedMotion]);
 
@@ -102,6 +88,8 @@ export const VideoBackground = () => {
           className="absolute top-0 left-1/2 -translate-x-1/2 w-[115%] h-[115%] object-cover"
           style={{ objectPosition: 'center top', opacity: reducedMotion ? 1 : 0 }}
           muted
+          autoPlay
+          loop
           playsInline
           preload={reducedMotion ? 'metadata' : 'auto'}
         />

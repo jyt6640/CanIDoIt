@@ -32,3 +32,6 @@ next-env.d.ts
 /prisma/dev.db-journal
 *.db
 *.db-journal
+
+# ChatGPT To Codex local artifacts
+/.chatgpt2codex/
