@@ -99,8 +99,8 @@ export const DestinationView = ({
   return (
     <div className="relative min-h-screen bg-light-bg font-noto text-black selection:bg-[#5ae14c]/30">
       {/* Light Header */}
-      <header className="sticky top-0 z-40 bg-white/90 backdrop-blur-md border-b border-gray-200">
-        <div className="max-w-[1200px] mx-auto px-5 md:px-[48px] lg:px-[120px] h-16 flex items-center justify-between">
+      <header className="sticky top-0 z-40 border-b border-gray-200 bg-white/90 px-5 backdrop-blur-md md:px-12 lg:px-[120px]">
+        <div className="mx-auto flex h-16 max-w-[1200px] items-center justify-between">
           <Link href="/" className="font-noto font-bold text-xl tracking-[-1px] text-black">
             해도돼?
           </Link>
