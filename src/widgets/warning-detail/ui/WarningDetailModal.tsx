@@ -12,6 +12,7 @@ import {
   ExternalLink,
 } from 'lucide-react';
 import { getRiskStyles } from '@/shared/lib/risk';
+import { useModalA11y } from '@/shared/lib/useModalA11y';
 import type { Warning } from '@/entities/warning';
 
 interface WarningDetailModalProps {
@@ -31,6 +32,7 @@ export const WarningDetailModal = ({
   onToggleSave,
   onShare,
 }: WarningDetailModalProps) => {
+  const dialogRef = useModalA11y<HTMLDivElement>(isOpen && !!item, onClose);
   if (!isOpen || !item) return null;
   const styles = getRiskStyles(item.risk);
   const RiskIcon = styles.icon;
@@ -39,7 +41,13 @@ export const WarningDetailModal = ({
     <div className="fixed inset-0 z-50 flex items-end md:items-center justify-center p-0 md:p-4 animate-fade-in">
       <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" onClick={onClose} />
 
-      <div className="relative w-full max-w-[600px] bg-white rounded-t-[24px] md:rounded-[24px] shadow-2xl flex flex-col max-h-[90vh] md:max-h-[85vh] animate-slide-up">
+      <div
+        ref={dialogRef}
+        role="dialog"
+        aria-modal="true"
+        aria-label={item.title}
+        className="relative w-full max-w-[600px] bg-white rounded-t-[24px] md:rounded-[24px] shadow-2xl flex flex-col max-h-[90vh] md:max-h-[85vh] animate-slide-up"
+      >
         {/* Header */}
         <div className="flex justify-between items-center p-5 md:p-6 border-b border-gray-100 shrink-0">
           <div className="flex gap-2">
