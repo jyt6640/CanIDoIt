@@ -27,10 +27,6 @@ export const DestinationView = ({ warnings, countryName, cityName }: Destination
 
   useBodyScrollLock(!!selectedWarning || isShareModalOpen);
 
-  const handleCopyLink = useCallback(() => {
-    showToast('공유 링크를 복사했어요.');
-  }, [showToast]);
-
   const handleShareFromDetail = useCallback(() => {
     setSelectedWarning(null);
     setTimeout(() => setIsShareModalOpen(true), 300);
@@ -79,7 +75,12 @@ export const DestinationView = ({ warnings, countryName, cityName }: Destination
         onShare={handleShareFromDetail}
       />
 
-      <ShareModal isOpen={isShareModalOpen} onClose={() => setIsShareModalOpen(false)} onCopyLink={handleCopyLink} />
+      <ShareModal
+        isOpen={isShareModalOpen}
+        onClose={() => setIsShareModalOpen(false)}
+        shareTitle={`${displayLocation}에서 조심할 행동`}
+        onNotify={showToast}
+      />
 
       <Toast message={toast.message} isVisible={toast.visible} />
 

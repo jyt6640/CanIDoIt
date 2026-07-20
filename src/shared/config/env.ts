@@ -10,4 +10,6 @@ export const env = {
   heroVideoUrl: process.env.NEXT_PUBLIC_HERO_VIDEO_URL ?? '',
   /** 사이트 기준 URL (메타데이터 canonical, 공유 링크 생성 등) */
   siteUrl: process.env.NEXT_PUBLIC_SITE_URL ?? 'http://localhost:3000',
+  /** 카카오 JavaScript 앱 키 (없으면 카카오 공유 버튼 비활성) */
+  kakaoJsKey: process.env.NEXT_PUBLIC_KAKAO_JS_KEY ?? '',
 } as const;
