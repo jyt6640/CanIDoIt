@@ -3,7 +3,7 @@ import type { Metadata } from 'next';
 import { DestinationView } from '@/views/destination';
 import { getDestinationWarnings } from '@/entities/warning/api/warningRepository';
 
-export const dynamic = 'force-dynamic';
+export const revalidate = 3600;
 
 interface PageProps {
   params: Promise<{ country: string }>;
