@@ -677,28 +677,31 @@ const DATA = [
 ];
 
 async function main() {
-  // 멱등성: 기존 데이터 정리 (Cascade로 하위 레코드 함께 삭제)
-  await prisma.source.deleteMany();
-  await prisma.warning.deleteMany();
-  await prisma.city.deleteMany();
-  await prisma.country.deleteMany();
+  if (process.env.NODE_ENV === 'production' && process.env.ALLOW_PRODUCTION_SEED !== 'true') {
+    throw new Error('운영 환경 Seed는 ALLOW_PRODUCTION_SEED=true일 때만 실행할 수 있습니다.');
+  }
 
   for (const c of DATA) {
-    const country = await prisma.country.create({
-      data: {
-        name: c.name,
-        slug: c.slug,
-        cities: { create: c.cities.map((city) => ({ name: city.name, slug: city.slug })) },
-      },
-      include: { cities: true },
+    const country = await prisma.country.upsert({
+      where: { slug: c.slug },
+      update: { name: c.name },
+      create: { name: c.name, slug: c.slug },
     });
 
-    const citySlugToId = Object.fromEntries(country.cities.map((city) => [city.slug, city.id]));
+    const cities = [];
+    for (const cityData of c.cities) {
+      cities.push(await prisma.city.upsert({
+        where: { countryId_slug: { countryId: country.id, slug: cityData.slug } },
+        update: { name: cityData.name },
+        create: { name: cityData.name, slug: cityData.slug, countryId: country.id },
+      }));
+    }
+    const citySlugToId = Object.fromEntries(cities.map((city) => [city.slug, city.id]));
 
     let order = 0;
     for (const w of c.warnings) {
-      await prisma.warning.create({
-        data: {
+      const key = `${c.slug}-${w.city ?? 'common'}-${String(order + 1).padStart(3, '0')}`;
+      const warningData = {
           title: w.title,
           category: w.category,
           risk: w.risk,
@@ -710,15 +713,26 @@ async function main() {
           checkNeeded: w.checkNeeded ?? null,
           locations: JSON.stringify(w.locations ?? []),
           order: order++,
+          archived: false,
           countryId: country.id,
           cityId: w.city ? (citySlugToId[w.city] ?? null) : null,
-          sources: {
-            create: (w.sources ?? []).map((s) => ({
+      };
+      const sources = (w.sources ?? []).map((s) => ({
               title: s.title,
               url: s.url ?? null,
               checkedAt: s.checkedAt ? new Date(s.checkedAt) : null,
-            })),
-          },
+      }));
+
+      await prisma.warning.upsert({
+        where: { key },
+        update: {
+          ...warningData,
+          sources: { deleteMany: {}, create: sources },
+        },
+        create: {
+          key,
+          ...warningData,
+          sources: { create: sources },
         },
       });
     }
