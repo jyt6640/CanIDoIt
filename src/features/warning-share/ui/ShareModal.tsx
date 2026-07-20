@@ -5,6 +5,7 @@ import { X, Copy, Check, MessageCircle } from 'lucide-react';
 import { copyToClipboard } from '@/shared/lib/clipboard';
 import { isKakaoShareEnabled, shareToKakao } from '@/shared/lib/kakao';
 import { useModalA11y } from '@/shared/lib/useModalA11y';
+import { track } from '@/shared/lib/analytics';
 
 interface ShareModalProps {
   isOpen: boolean;
@@ -28,6 +29,7 @@ export const ShareModal = ({ isOpen, onClose, shareTitle, onNotify }: ShareModal
     const ok = await copyToClipboard(getUrl());
     if (ok) {
       setCopied(true);
+      track('share_copy', {});
       onNotify('공유 링크를 복사했어요.');
       setTimeout(() => setCopied(false), 1500);
     } else {

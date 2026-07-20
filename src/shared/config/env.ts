@@ -14,4 +14,6 @@ export const env = {
   siteUrl: process.env.NEXT_PUBLIC_SITE_URL ?? 'http://localhost:3000',
   /** 카카오 JavaScript 앱 키 (없으면 카카오 공유 버튼 비활성) */
   kakaoJsKey: process.env.NEXT_PUBLIC_KAKAO_JS_KEY ?? '',
+  /** Google Analytics 4 측정 ID (예: G-XXXXXXX). 없으면 계측 비활성 */
+  gaId: process.env.NEXT_PUBLIC_GA_ID ?? '',
 } as const;

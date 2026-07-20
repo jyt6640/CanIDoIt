@@ -4,6 +4,7 @@ import { useState, useTransition } from 'react';
 import { useRouter } from 'next/navigation';
 import { ChevronDown, ArrowUpRight, MapPin, Search, CheckCircle2 } from 'lucide-react';
 import type { DestinationCountry } from '@/entities/destination';
+import { track } from '@/shared/lib/analytics';
 
 interface SearchCardProps {
   countries: DestinationCountry[];
@@ -25,6 +26,7 @@ export const SearchCard = ({ countries }: SearchCardProps) => {
 
   const go = (country: string, city?: string) => {
     if (!country) return;
+    track('search', { country, city });
     const href = city ? `/${country}/${city}` : `/${country}`;
     startTransition(() => router.push(href));
   };

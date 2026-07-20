@@ -1,3 +1,4 @@
+import Link from 'next/link';
 import { ShieldAlert } from 'lucide-react';
 
 export const Footer = () => (
@@ -9,11 +10,8 @@ export const Footer = () => (
       </div>
 
       <div className="flex flex-wrap justify-center gap-6 font-noto text-[13px] font-medium text-gray-500">
-        <a href="#" className="hover:text-black transition-colors">서비스 소개</a>
-        <a href="#" className="hover:text-black transition-colors">정보 제공 원칙</a>
-        <a href="#" className="hover:text-black transition-colors">이용약관</a>
-        <a href="#" className="hover:text-black transition-colors">개인정보처리방침</a>
-        <a href="#" className="hover:text-black transition-colors">문의하기</a>
+        <Link href="/terms" className="hover:text-black transition-colors">이용약관</Link>
+        <Link href="/privacy" className="hover:text-black transition-colors">개인정보처리방침</Link>
       </div>
     </div>
     <div className="max-w-[1200px] mx-auto mt-10 pt-6 border-t border-gray-100 text-center md:text-left flex flex-col md:flex-row justify-between items-center gap-4">
