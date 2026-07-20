@@ -29,6 +29,8 @@ type PrismaWarning = {
   diffFromKorea: string | null;
   checkNeeded: string | null;
   locations: string[];
+  keywords: string[];
+  aliases: string[];
   sources: { title: string; url: string | null; checkedAt: Date | null }[];
   status: 'DRAFT' | 'REVIEWING' | 'VERIFIED' | 'STALE' | 'ARCHIVED';
   verifiedAt: Date | null;
@@ -58,6 +60,8 @@ function toWarning(w: PrismaWarning): Warning {
     diffFromKorea: w.diffFromKorea,
     checkNeeded: w.checkNeeded,
     locations: w.locations,
+    keywords: w.keywords,
+    aliases: w.aliases,
     sources: w.sources.map((s) => ({
       title: s.title,
       url: s.url,

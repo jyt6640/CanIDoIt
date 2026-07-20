@@ -63,6 +63,8 @@ model Warning {
   diffFromKorea String?
   checkNeeded   String?
   locations     String[] @default([])
+  keywords      String[] @default([])
+  aliases       String[] @default([])
   order         Int      @default(0) // 노출 정렬 순서
 
   country   Country @relation(fields: [countryId], references: [id], onDelete: Cascade)

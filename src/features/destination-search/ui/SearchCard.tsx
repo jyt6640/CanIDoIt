@@ -21,6 +21,7 @@ export const SearchCard = ({ countries }: SearchCardProps) => {
   const [isPending, startTransition] = useTransition();
   const [countrySlug, setCountrySlug] = useState('');
   const [citySlug, setCitySlug] = useState('');
+  const [question, setQuestion] = useState('');
 
   const selectedCountry = countries.find((c) => c.slug === countrySlug);
 
@@ -48,6 +49,28 @@ export const SearchCard = ({ countries }: SearchCardProps) => {
           <span className="font-noto font-medium text-[12px]">출처 기반 주의사항</span>
         </div>
       </div>
+
+      <form
+        className="mb-3 flex gap-2 rounded-[14px] bg-white p-3"
+        onSubmit={(event) => {
+          event.preventDefault();
+          const query = question.trim();
+          if (!query) return;
+          track('behavior_search', { query });
+          router.push(`/search?q=${encodeURIComponent(query)}`);
+        }}
+      >
+        <input
+          value={question}
+          onChange={(event) => setQuestion(event.target.value)}
+          placeholder="예: 태국에 전자담배 가져가도 돼?"
+          aria-label="행동 질문 검색"
+          className="min-w-0 flex-1 rounded-lg bg-gray-50 px-4 py-3 font-noto text-[15px] text-black outline-none ring-black/20 focus:ring-2"
+        />
+        <button type="submit" className="rounded-lg bg-black px-4 text-white" aria-label="행동 검색">
+          <Search size={18} />
+        </button>
+      </form>
 
       {/* Main Input Area */}
       <div className="bg-white rounded-[14px] p-4 shadow-inner flex flex-col md:flex-row gap-4 items-center relative">

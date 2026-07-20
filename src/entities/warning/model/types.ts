@@ -16,6 +16,8 @@ export interface Warning {
   diffFromKorea?: string | null;
   checkNeeded?: string | null;
   locations: string[];
+  keywords?: string[];
+  aliases?: string[];
   sources?: WarningSource[];
   status?: 'DRAFT' | 'REVIEWING' | 'VERIFIED' | 'STALE' | 'ARCHIVED';
   verifiedAt?: string | null;
