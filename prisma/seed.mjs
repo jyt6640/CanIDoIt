@@ -714,6 +714,11 @@ async function main() {
           locations: JSON.stringify(w.locations ?? []),
           order: order++,
           archived: false,
+          status: (w.sources ?? []).length > 0 ? 'VERIFIED' : 'REVIEWING',
+          verifiedAt: (w.sources ?? []).length > 0 ? new Date('2026-07-18T00:00:00.000Z') : null,
+          expiresAt: (w.sources ?? []).length > 0 ? new Date('2026-10-16T00:00:00.000Z') : null,
+          reviewedBy: (w.sources ?? []).length > 0 ? 'content-team' : null,
+          confidence: (w.sources ?? []).some((source) => source.url) ? 95 : 70,
           countryId: country.id,
           cityId: w.city ? (citySlugToId[w.city] ?? null) : null,
       };

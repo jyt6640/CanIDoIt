@@ -24,6 +24,11 @@ type PrismaWarning = {
   checkNeeded: string | null;
   locations: string;
   sources: { title: string; url: string | null; checkedAt: Date | null }[];
+  status: 'DRAFT' | 'REVIEWING' | 'VERIFIED' | 'STALE' | 'ARCHIVED';
+  verifiedAt: Date | null;
+  expiresAt: Date | null;
+  reviewedBy: string | null;
+  confidence: number | null;
 };
 
 function toWarning(w: PrismaWarning): Warning {
@@ -52,6 +57,11 @@ function toWarning(w: PrismaWarning): Warning {
       url: s.url,
       checkedAt: s.checkedAt ? s.checkedAt.toISOString() : null,
     })),
+    status: w.expiresAt && w.expiresAt < new Date() && w.status === 'VERIFIED' ? 'STALE' : w.status,
+    verifiedAt: w.verifiedAt?.toISOString() ?? null,
+    expiresAt: w.expiresAt?.toISOString() ?? null,
+    reviewedBy: w.reviewedBy,
+    confidence: w.confidence,
   };
 }
 
@@ -95,6 +105,7 @@ export const getDestinationWarnings = cache(async (
     where: {
       countryId: country.id,
       archived: false,
+      status: { in: ['VERIFIED', 'STALE', 'REVIEWING'] },
       // 도시 지정 시: 국가 공통(cityId null) + 해당 도시. 미지정 시: 국가 공통만.
       ...(city ? { OR: [{ cityId: null }, { cityId: city.id }] } : { cityId: null }),
     },
