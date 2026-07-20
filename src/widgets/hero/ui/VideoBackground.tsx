@@ -1,9 +1,9 @@
 'use client';
 
 import { useEffect, useRef } from 'react';
+import { env } from '@/shared/config/env';
 
-const VIDEO_SRC =
-  'https://d8j0ntlcm91z4.cloudfront.net/user_38xzZboKViGWJOttwIXH07lWA1P/hf_20260329_050842_be71947f-f16e-4a14-810c-06e83d23ddb5.mp4';
+const VIDEO_SRC = env.heroVideoUrl;
 
 export const VideoBackground = () => {
   const videoRef = useRef<HTMLVideoElement>(null);
@@ -85,15 +85,17 @@ export const VideoBackground = () => {
 
   return (
     <div className="absolute inset-0 w-full h-full overflow-hidden bg-black z-0">
-      {/* eslint-disable-next-line jsx-a11y/media-has-caption */}
-      <video
-        ref={videoRef}
-        src={VIDEO_SRC}
-        className="absolute top-0 left-1/2 -translate-x-1/2 w-[115%] h-[115%] object-cover"
-        style={{ objectPosition: 'center top', opacity: 0 }}
-        muted
-        playsInline
-      />
+      {VIDEO_SRC && (
+        // eslint-disable-next-line jsx-a11y/media-has-caption
+        <video
+          ref={videoRef}
+          src={VIDEO_SRC}
+          className="absolute top-0 left-1/2 -translate-x-1/2 w-[115%] h-[115%] object-cover"
+          style={{ objectPosition: 'center top', opacity: 0 }}
+          muted
+          playsInline
+        />
+      )}
       {/* Gradient Overlay for text readability */}
       <div
         className="absolute inset-0 z-10"
