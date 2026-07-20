@@ -18,6 +18,22 @@ npm run build    # 프로덕션 빌드
 npm start        # 프로덕션 서버
 ```
 
+## 품질 검증
+
+Pull Request와 `main` 푸시에서는 GitHub Actions가 아래 순서로 검증합니다.
+
+```bash
+npm ci
+npm run lint
+npm run typecheck
+npm test
+npm run build
+```
+
+로컬에서는 `npm run check`로 lint, typecheck, test를 한 번에 실행할 수 있습니다. 데이터베이스 마이그레이션은 빌드와 분리되어 있으며 배포 단계에서 `npm run deploy:migrate`를 한 번 실행합니다.
+
+운영 상태 확인 경로는 `/api/health`입니다. 데이터베이스 연결까지 성공하면 HTTP 200과 `status: "ok"`를 반환합니다.
+
 ## 아키텍처 — Feature-Sliced Design (FSD)
 
 Next.js App Router의 `pages` 개념과 충돌을 피하기 위해 FSD의 `pages` 레이어는 `views`로 대체했습니다.

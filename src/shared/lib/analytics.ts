@@ -32,7 +32,6 @@ export function track<E extends AnalyticsEvent>(name: E['name'], params: E['para
   }
 
   if (process.env.NODE_ENV === 'development') {
-    // eslint-disable-next-line no-console
     console.debug('[analytics]', name, params);
   }
 }

@@ -95,7 +95,6 @@ export const VideoBackground = () => {
   return (
     <div className="absolute inset-0 w-full h-full overflow-hidden bg-black z-0">
       {VIDEO_SRC && (
-        // eslint-disable-next-line jsx-a11y/media-has-caption
         <video
           ref={videoRef}
           src={VIDEO_SRC}
