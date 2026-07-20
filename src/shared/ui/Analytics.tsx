@@ -1,24 +1,41 @@
 'use client';
 
-import { useState } from 'react';
+import { useSyncExternalStore } from 'react';
 import Script from 'next/script';
 import { env } from '@/shared/config/env';
 
 const CONSENT_KEY = 'hedodwae:analytics-consent';
+const CONSENT_EVENT = 'hedodwae:analytics-consent-changed';
+
+type Consent = 'accepted' | 'declined' | null;
+
+const readConsent = (): Consent => {
+  if (typeof window === 'undefined') return null;
+  const value = window.localStorage.getItem(CONSENT_KEY);
+  return value === 'accepted' || value === 'declined' ? value : null;
+};
+
+const subscribe = (onStoreChange: () => void) => {
+  const onStorage = (event: StorageEvent) => {
+    if (event.key === CONSENT_KEY) onStoreChange();
+  };
+  window.addEventListener('storage', onStorage);
+  window.addEventListener(CONSENT_EVENT, onStoreChange);
+  return () => {
+    window.removeEventListener('storage', onStorage);
+    window.removeEventListener(CONSENT_EVENT, onStoreChange);
+  };
+};
 
 /** GA4 스크립트 로더. NEXT_PUBLIC_GA_ID 설정 시에만 렌더. */
 export const Analytics = () => {
-  const [consent, setConsent] = useState<'accepted' | 'declined' | null>(() => {
-    if (typeof window === 'undefined') return null;
-    const value = window.localStorage.getItem(CONSENT_KEY);
-    return value === 'accepted' || value === 'declined' ? value : null;
-  });
+  const consent = useSyncExternalStore(subscribe, readConsent, () => null);
 
   if (!env.gaId) return null;
 
   const choose = (value: 'accepted' | 'declined') => {
     window.localStorage.setItem(CONSENT_KEY, value);
-    setConsent(value);
+    window.dispatchEvent(new Event(CONSENT_EVENT));
   };
 
   return (
