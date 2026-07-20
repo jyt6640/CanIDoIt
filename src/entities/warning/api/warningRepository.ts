@@ -10,6 +10,12 @@ export interface DestinationWarnings {
   warnings: Warning[];
 }
 
+export interface SavedWarningRecord {
+  warning: Warning;
+  country: { name: string; slug: string };
+  city: { name: string; slug: string } | null;
+}
+
 type PrismaWarning = {
   id: string;
   key: string;
@@ -118,4 +124,21 @@ export const getDestinationWarnings = cache(async (
     city: city ? { name: city.name, slug: city.slug } : null,
     warnings: warnings.map(toWarning),
   };
+});
+
+export const getAllPublicWarnings = cache(async (): Promise<SavedWarningRecord[]> => {
+  const warnings = await prisma.warning.findMany({
+    where: {
+      archived: false,
+      status: { in: ['VERIFIED', 'STALE', 'REVIEWING'] },
+    },
+    orderBy: [{ country: { name: 'asc' } }, { city: { name: 'asc' } }, { order: 'asc' }],
+    include: { sources: true, country: true, city: true },
+  });
+
+  return warnings.map((warning) => ({
+    warning: toWarning(warning),
+    country: { name: warning.country.name, slug: warning.country.slug },
+    city: warning.city ? { name: warning.city.name, slug: warning.city.slug } : null,
+  }));
 });

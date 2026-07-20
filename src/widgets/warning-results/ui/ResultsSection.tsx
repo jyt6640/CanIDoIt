@@ -1,6 +1,7 @@
 'use client';
 
 import { useMemo } from 'react';
+import Link from 'next/link';
 import { Search, Info, AlertTriangle, Bookmark, Share2, ArrowRight, X } from 'lucide-react';
 import { WarningCard, CriticalCard, type Warning } from '@/entities/warning';
 import { useWarningFilter, CategoryFilter, LocationFilter } from '@/features/warning-filter';
@@ -69,12 +70,13 @@ export const ResultsSection = ({
                 <span className="text-gray-500">개</span>
               </div>
               <div className="w-[1px] h-4 bg-gray-300"></div>
-              <button
+              <Link
+                href="/saved"
                 className="flex items-center gap-1.5 text-gray-500 hover:text-black font-noto text-[14px] transition-colors"
                 aria-label="저장한 항목 보기"
               >
                 <Bookmark size={16} /> <span className="hidden md:inline">저장 {savedItems.size}</span>
-              </button>
+              </Link>
               <button
                 onClick={onOpenShare}
                 className="flex items-center gap-1.5 text-gray-500 hover:text-black font-noto text-[14px] transition-colors"
