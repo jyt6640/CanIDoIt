@@ -18,6 +18,13 @@ enum WarningStatus {
   ARCHIVED
 }
 
+enum RiskLevel {
+  CRITICAL
+  HIGH
+  MEDIUM
+  INFO
+}
+
 model Country {
   id       String    @id @default(cuid())
   name     String    @unique // 표시명 (예: 일본)
@@ -48,14 +55,14 @@ model Warning {
   confidence    Int?
   title         String
   category      String
-  risk          String // 매우 높음 | 높음 | 보통 | 참고
+  risk          RiskLevel
   type          String
   range         String
   reason        String
   alternative   String
   diffFromKorea String?
   checkNeeded   String?
-  locations     String   @default("[]") // JSON 문자열 (SQLite는 스칼라 배열 미지원)
+  locations     String[] @default([])
   order         Int      @default(0) // 노출 정렬 순서
 
   country   Country @relation(fields: [countryId], references: [id], onDelete: Cascade)

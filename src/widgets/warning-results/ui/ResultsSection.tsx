@@ -25,7 +25,7 @@ export const ResultsSection = ({
   onOpenWarning,
   onOpenShare,
 }: ResultsSectionProps) => {
-  const { activeCategory, setActiveCategory, activeLocation, selectLocation, filteredWarnings, resetFilters } =
+  const { activeCategory, setActiveCategory, activeLocation, selectLocation, filteredWarnings, resetFilters, categories, locations } =
     useWarningFilter(warnings);
 
   const topCriticalWarnings = useMemo(
@@ -149,10 +149,10 @@ export const ResultsSection = ({
         )}
 
         {/* Location Quick View */}
-        <LocationFilter activeLocation={activeLocation} onSelect={selectLocation} />
+        <LocationFilter activeLocation={activeLocation} onSelect={selectLocation} locations={locations} />
 
         {/* Category Filter */}
-        <CategoryFilter activeCategory={activeCategory} onSelect={setActiveCategory} />
+        <CategoryFilter activeCategory={activeCategory} onSelect={setActiveCategory} categories={categories} />
 
         {/* Warnings Grid */}
         <div className="mb-20">

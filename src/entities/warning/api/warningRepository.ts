@@ -21,14 +21,14 @@ type PrismaWarning = {
   key: string;
   title: string;
   category: string;
-  risk: string;
+  risk: 'CRITICAL' | 'HIGH' | 'MEDIUM' | 'INFO';
   type: string;
   range: string;
   reason: string;
   alternative: string;
   diffFromKorea: string | null;
   checkNeeded: string | null;
-  locations: string;
+  locations: string[];
   sources: { title: string; url: string | null; checkedAt: Date | null }[];
   status: 'DRAFT' | 'REVIEWING' | 'VERIFIED' | 'STALE' | 'ARCHIVED';
   verifiedAt: Date | null;
@@ -37,27 +37,27 @@ type PrismaWarning = {
   confidence: number | null;
 };
 
+const RISK_LABEL: Record<PrismaWarning['risk'], string> = {
+  CRITICAL: '매우 높음',
+  HIGH: '높음',
+  MEDIUM: '보통',
+  INFO: '참고',
+};
+
 function toWarning(w: PrismaWarning): Warning {
-  let locations: string[] = [];
-  try {
-    const parsed = JSON.parse(w.locations);
-    if (Array.isArray(parsed)) locations = parsed.filter((x): x is string => typeof x === 'string');
-  } catch {
-    locations = [];
-  }
 
   return {
     id: w.key,
     title: w.title,
     category: w.category,
-    risk: w.risk,
+    risk: RISK_LABEL[w.risk],
     type: w.type,
     range: w.range,
     reason: w.reason,
     alternative: w.alternative,
     diffFromKorea: w.diffFromKorea,
     checkNeeded: w.checkNeeded,
-    locations,
+    locations: w.locations,
     sources: w.sources.map((s) => ({
       title: s.title,
       url: s.url,

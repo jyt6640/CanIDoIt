@@ -17,6 +17,15 @@ export const useWarningFilter = (warnings: Warning[]) => {
     });
   }, [warnings, activeCategory, activeLocation]);
 
+  const categories = useMemo(
+    () => ['전체', ...Array.from(new Set(warnings.map((item) => item.category)))],
+    [warnings],
+  );
+  const locations = useMemo(
+    () => ['전체', ...Array.from(new Set(warnings.flatMap((item) => item.locations)))],
+    [warnings],
+  );
+
   /** 장소 선택 시 과도한 필터링을 막기 위해 카테고리를 초기화 */
   const selectLocation = useCallback((location: string) => {
     setActiveLocation(location);
@@ -34,6 +43,8 @@ export const useWarningFilter = (warnings: Warning[]) => {
     activeLocation,
     selectLocation,
     filteredWarnings,
+    categories,
+    locations,
     resetFilters,
   };
 };
