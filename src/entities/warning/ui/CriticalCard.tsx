@@ -6,7 +6,7 @@ interface CriticalCardProps {
   item: Warning;
   index: number;
   isSaved: boolean;
-  onToggleSave: (id: number) => void;
+  onToggleSave: (id: string) => void;
   onClick: (item: Warning) => void;
 }
 

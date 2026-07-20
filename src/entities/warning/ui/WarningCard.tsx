@@ -5,7 +5,7 @@ import type { Warning } from '../model/types';
 interface WarningCardProps {
   item: Warning;
   isSaved: boolean;
-  onToggleSave: (id: number) => void;
+  onToggleSave: (id: string) => void;
   onClick: (item: Warning) => void;
 }
 

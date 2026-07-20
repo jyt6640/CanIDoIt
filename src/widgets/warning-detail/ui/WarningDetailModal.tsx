@@ -17,7 +17,7 @@ interface WarningDetailModalProps {
   isOpen: boolean;
   onClose: () => void;
   isSaved: boolean;
-  onToggleSave: (id: number) => void;
+  onToggleSave: (id: string) => void;
   onShare: (item: Warning) => void;
 }
 

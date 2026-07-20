@@ -4,9 +4,9 @@ import { useCallback, useState } from 'react';
 
 /** 저장(북마크)한 주의사항 id 집합을 관리 */
 export const useSavedItems = () => {
-  const [savedItems, setSavedItems] = useState<Set<number>>(new Set());
+  const [savedItems, setSavedItems] = useState<Set<string>>(new Set());
 
-  const toggleSave = useCallback((id: number) => {
+  const toggleSave = useCallback((id: string) => {
     setSavedItems((prev) => {
       const next = new Set(prev);
       if (next.has(id)) next.delete(id);
@@ -15,7 +15,7 @@ export const useSavedItems = () => {
     });
   }, []);
 
-  const isSaved = useCallback((id: number) => savedItems.has(id), [savedItems]);
+  const isSaved = useCallback((id: string) => savedItems.has(id), [savedItems]);
 
   return { savedItems, toggleSave, isSaved };
 };

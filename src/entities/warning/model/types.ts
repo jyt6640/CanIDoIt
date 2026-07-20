@@ -1,5 +1,11 @@
+export interface WarningSource {
+  title: string;
+  url?: string | null;
+  checkedAt?: string | null;
+}
+
 export interface Warning {
-  id: number;
+  id: string;
   title: string;
   category: string;
   risk: string;
@@ -7,7 +13,8 @@ export interface Warning {
   range: string;
   reason: string;
   alternative: string;
-  diffFromKorea?: string;
-  checkNeeded?: string;
+  diffFromKorea?: string | null;
+  checkNeeded?: string | null;
   locations: string[];
+  sources?: WarningSource[];
 }
