@@ -719,6 +719,8 @@ async function main() {
           diffFromKorea: w.diffFromKorea ?? null,
           checkNeeded: w.checkNeeded ?? null,
           locations: w.locations ?? [],
+          keywords: Array.from(new Set([w.category, w.type, ...(w.locations ?? [])])),
+          aliases: [w.title.replace(/(하지|마세요|않도록|금지).*/g, '').trim()].filter(Boolean),
           order: order++,
           archived: false,
           status: (w.sources ?? []).length > 0 ? 'VERIFIED' : 'REVIEWING',

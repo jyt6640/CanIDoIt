@@ -8,7 +8,8 @@ type AnalyticsEvent =
   | { name: 'save_toggle'; params: { id: string; saved: boolean } }
   | { name: 'open_warning'; params: { id: string } }
   | { name: 'share_open'; params: Record<string, never> }
-  | { name: 'share_copy'; params: Record<string, never> };
+  | { name: 'share_copy'; params: Record<string, never> }
+  | { name: 'behavior_search'; params: { query: string } };
 
 type Gtag = (command: string, action: string, params?: Record<string, unknown>) => void;
 

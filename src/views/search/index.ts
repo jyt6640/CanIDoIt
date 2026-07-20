@@ -1,0 +1,1 @@
+export { BehaviorSearchView } from './ui/BehaviorSearchView';
