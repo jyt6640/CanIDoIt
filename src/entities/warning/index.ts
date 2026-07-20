@@ -1,4 +1,3 @@
-export type { Warning } from './model/types';
-export { MOCK_WARNINGS } from './model/mock';
+export type { Warning, WarningSource } from './model/types';
 export { WarningCard } from './ui/WarningCard';
 export { CriticalCard } from './ui/CriticalCard';

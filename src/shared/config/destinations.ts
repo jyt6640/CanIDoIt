@@ -9,13 +9,6 @@ import {
   type LucideIcon,
 } from 'lucide-react';
 
-/** 나라 → 도시 매핑 */
-export const DESTINATION_DATA: Record<string, string[]> = {
-  일본: ['오사카', '도쿄', '교토'],
-  태국: ['방콕', '치앙마이', '푸껫'],
-  싱가포르: ['싱가포르'],
-};
-
 /** 카테고리 필터 목록 */
 export const CATEGORIES = [
   '전체',
