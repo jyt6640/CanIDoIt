@@ -14,7 +14,7 @@ export const Navigation = ({ onScrollToSearch }: NavigationProps) => {
 
   return (
     <nav className="relative z-30 w-full px-5 md:px-[120px] py-4 flex justify-between items-center bg-transparent">
-      <div className="font-noto font-bold text-2xl tracking-[-1.2px] text-black cursor-pointer">헤도돼?</div>
+      <div className="font-noto font-bold text-2xl tracking-[-1.2px] text-black cursor-pointer">해도돼?</div>
 
       {/* Desktop Menu */}
       <div className="hidden md:flex items-center gap-8 font-noto font-medium text-[15px] tracking-tight text-gray-800">

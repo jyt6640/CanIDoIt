@@ -1,4 +1,4 @@
-// Prisma schema — 헤도돼? 여행 주의사항 데이터 모델
+// Prisma schema — 해도돼? 여행 주의사항 데이터 모델
 // 로컬 개발은 SQLite. 프로덕션 전환 시 datasource provider만 postgresql 로 교체.
 
 generator client {

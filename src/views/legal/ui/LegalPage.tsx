@@ -18,7 +18,7 @@ export const LegalPage = ({ title, updatedAt, sections }: LegalPageProps) => (
     <header className="sticky top-0 z-40 bg-white/90 backdrop-blur-md border-b border-gray-200">
       <div className="max-w-[800px] mx-auto px-5 md:px-8 h-16 flex items-center justify-between">
         <Link href="/" className="font-noto font-bold text-xl tracking-[-1px] text-black">
-          헤도돼?
+          해도돼?
         </Link>
         <Link
           href="/"

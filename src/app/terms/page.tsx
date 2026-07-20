@@ -2,15 +2,15 @@ import type { Metadata } from 'next';
 import { LegalPage, type LegalSection } from '@/views/legal';
 
 export const metadata: Metadata = {
-  title: '이용약관 — 헤도돼?',
-  description: '헤도돼? 서비스 이용약관(초안).',
+  title: '이용약관 — 해도돼?',
+  description: '해도돼? 서비스 이용약관(초안).',
 };
 
 const SECTIONS: LegalSection[] = [
   {
     heading: '목적',
     body: [
-      '본 약관은 "헤도돼?"(이하 "서비스")가 제공하는 여행지 주의사항 정보 서비스의 이용 조건과 절차, 이용자와 서비스의 권리·의무 및 책임 사항을 규정합니다.',
+      '본 약관은 "해도돼?"(이하 "서비스")가 제공하는 여행지 주의사항 정보 서비스의 이용 조건과 절차, 이용자와 서비스의 권리·의무 및 책임 사항을 규정합니다.',
     ],
   },
   {
