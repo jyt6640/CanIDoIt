@@ -2,13 +2,17 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
-import { ChevronDown, Menu, X } from 'lucide-react';
+import { Menu, X } from 'lucide-react';
 
 interface NavigationProps {
   onScrollToSearch: () => void;
 }
 
-const MENU_ITEMS = ['서비스 소개', '주의사항', '사용 방법', '인기 여행지', '문의'];
+const MENU_ITEMS = [
+  { label: '이용약관', href: '/terms' },
+  { label: '개인정보처리방침', href: '/privacy' },
+  { label: '문의', href: 'https://github.com/jyt6640/CanIDoIt/issues/new' },
+];
 
 export const Navigation = ({ onScrollToSearch }: NavigationProps) => {
   const [menuOpen, setMenuOpen] = useState(false);
@@ -19,13 +23,11 @@ export const Navigation = ({ onScrollToSearch }: NavigationProps) => {
 
       {/* Desktop Menu */}
       <div className="hidden md:flex items-center gap-8 font-noto font-medium text-[15px] tracking-tight text-gray-800">
-        <button className="hover:text-black transition-colors">서비스 소개</button>
-        <button className="flex items-center gap-1 hover:text-black transition-colors">
-          주의사항 <ChevronDown size={16} />
-        </button>
-        <button className="hover:text-black transition-colors">사용 방법</button>
-        <button className="hover:text-black transition-colors">인기 여행지</button>
-        <button className="hover:text-black transition-colors">문의</button>
+        {MENU_ITEMS.map((item) => (
+          <Link key={item.label} href={item.href} className="hover:text-black transition-colors">
+            {item.label}
+          </Link>
+        ))}
       </div>
 
       {/* Action Buttons */}
@@ -55,13 +57,14 @@ export const Navigation = ({ onScrollToSearch }: NavigationProps) => {
         <div className="md:hidden absolute top-full left-0 right-0 mx-5 mt-2 bg-white rounded-2xl shadow-xl border border-gray-100 overflow-hidden animate-fade-in">
           <div className="flex flex-col py-2">
             {MENU_ITEMS.map((item) => (
-              <button
-                key={item}
+              <Link
+                key={item.label}
+                href={item.href}
                 onClick={() => setMenuOpen(false)}
                 className="px-5 py-3 text-left font-noto font-medium text-[15px] text-gray-800 hover:bg-gray-50 transition-colors"
               >
-                {item}
-              </button>
+                {item.label}
+              </Link>
             ))}
             <Link
               href="/saved"

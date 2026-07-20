@@ -4,6 +4,13 @@ import { PrismaClient } from '@prisma/client';
 
 const prisma = new PrismaClient();
 
+const RISK_MAP = {
+  '매우 높음': 'CRITICAL',
+  '높음': 'HIGH',
+  '보통': 'MEDIUM',
+  '참고': 'INFO',
+};
+
 /**
  * 데이터 구조:
  * countries[].cities[] : 도시 슬러그 정의
@@ -704,14 +711,14 @@ async function main() {
       const warningData = {
           title: w.title,
           category: w.category,
-          risk: w.risk,
+          risk: RISK_MAP[w.risk],
           type: w.type,
           range: w.range,
           reason: w.reason,
           alternative: w.alternative,
           diffFromKorea: w.diffFromKorea ?? null,
           checkNeeded: w.checkNeeded ?? null,
-          locations: JSON.stringify(w.locations ?? []),
+          locations: w.locations ?? [],
           order: order++,
           archived: false,
           status: (w.sources ?? []).length > 0 ? 'VERIFIED' : 'REVIEWING',
