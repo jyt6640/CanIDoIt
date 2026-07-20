@@ -3,7 +3,7 @@ import type { Warning } from './types';
 /** 서비스 검증용 예시 데이터 (오사카/일본 기준 프로토타입) */
 export const MOCK_WARNINGS: Warning[] = [
   {
-    id: 1,
+    id: '1',
     title: '지정된 장소가 아닌 곳에서 흡연하지 마세요',
     category: '법률·안전',
     risk: '매우 높음',
@@ -16,7 +16,7 @@ export const MOCK_WARNINGS: Warning[] = [
     locations: ['거리·공공장소'],
   },
   {
-    id: 2,
+    id: '2',
     title: '지하철과 전철 안에서 큰 소리로 통화하지 마세요',
     category: '대중교통',
     risk: '보통',
@@ -31,7 +31,7 @@ export const MOCK_WARNINGS: Warning[] = [
     locations: ['지하철', '대중교통'],
   },
   {
-    id: 3,
+    id: '3',
     title: '열차 문 앞을 막고 서 있지 마세요',
     category: '대중교통',
     risk: '보통',
@@ -42,7 +42,7 @@ export const MOCK_WARNINGS: Warning[] = [
     locations: ['지하철', '대중교통'],
   },
   {
-    id: 4,
+    id: '4',
     title: '온천에 들어가기 전 몸을 씻지 않고 탕에 들어가지 마세요',
     category: '목욕·온천',
     risk: '높음',
@@ -54,7 +54,7 @@ export const MOCK_WARNINGS: Warning[] = [
     locations: ['온천'],
   },
   {
-    id: 5,
+    id: '5',
     title: '수건을 온천 물속에 넣지 마세요',
     category: '목욕·온천',
     risk: '높음',
@@ -65,7 +65,7 @@ export const MOCK_WARNINGS: Warning[] = [
     locations: ['온천'],
   },
   {
-    id: 6,
+    id: '6',
     title: '문신이 있다고 모든 온천에 바로 입장하지 마세요',
     category: '목욕·온천',
     risk: '높음',
@@ -79,7 +79,7 @@ export const MOCK_WARNINGS: Warning[] = [
     locations: ['온천'],
   },
   {
-    id: 7,
+    id: '7',
     title: '식당 예약을 연락 없이 취소하지 마세요 (노쇼)',
     category: '식당',
     risk: '높음',
@@ -92,7 +92,7 @@ export const MOCK_WARNINGS: Warning[] = [
     locations: ['식당'],
   },
   {
-    id: 8,
+    id: '8',
     title: '식당 직원을 반복해서 큰 소리로 부르지 마세요',
     category: '식당',
     risk: '참고',
@@ -104,7 +104,7 @@ export const MOCK_WARNINGS: Warning[] = [
     locations: ['식당'],
   },
   {
-    id: 9,
+    id: '9',
     title: '촬영 금지 표시가 있는 상점 내부나 인물을 허락 없이 촬영하지 마세요',
     category: '사진 촬영',
     risk: '높음',
@@ -116,7 +116,7 @@ export const MOCK_WARNINGS: Warning[] = [
     locations: ['시장', '거리·공공장소'],
   },
   {
-    id: 10,
+    id: '10',
     title: '신사나 사찰의 제한 구역에 들어가지 마세요',
     category: '종교시설',
     risk: '높음',
@@ -127,7 +127,7 @@ export const MOCK_WARNINGS: Warning[] = [
     locations: ['사찰·신사'],
   },
   {
-    id: 11,
+    id: '11',
     title: '택시 문을 억지로 직접 열고 닫지 마세요',
     category: '대중교통',
     risk: '참고',
@@ -140,7 +140,7 @@ export const MOCK_WARNINGS: Warning[] = [
     locations: ['대중교통'],
   },
   {
-    id: 12,
+    id: '12',
     title: '쓰레기를 아무 곳에나 버리지 마세요',
     category: '거리·공공장소',
     risk: '보통',

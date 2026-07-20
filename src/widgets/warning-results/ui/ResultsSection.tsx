@@ -27,8 +27,8 @@ interface ResultsSectionProps {
   hasSearched: boolean;
   selectedCountry: string;
   selectedCity: string;
-  savedItems: Set<number>;
-  onToggleSave: (id: number) => void;
+  savedItems: Set<string>;
+  onToggleSave: (id: string) => void;
   onOpenWarning: (item: Warning) => void;
   onOpenShare: () => void;
 }

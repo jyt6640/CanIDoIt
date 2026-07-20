@@ -1,0 +1,68 @@
+// Prisma schema — 헤도돼? 여행 주의사항 데이터 모델
+// 로컬 개발은 SQLite. 프로덕션 전환 시 datasource provider만 postgresql 로 교체.
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model Country {
+  id       String    @id @default(cuid())
+  name     String    @unique // 표시명 (예: 일본)
+  slug     String    @unique // URL 슬러그 (예: japan)
+  cities   City[]
+  warnings Warning[]
+}
+
+model City {
+  id        String    @id @default(cuid())
+  name      String // 표시명 (예: 오사카)
+  slug      String // URL 슬러그 (예: osaka)
+  country   Country   @relation(fields: [countryId], references: [id], onDelete: Cascade)
+  countryId String
+  warnings  Warning[]
+
+  @@unique([countryId, slug])
+}
+
+model Warning {
+  id            String   @id @default(cuid())
+  title         String
+  category      String
+  risk          String // 매우 높음 | 높음 | 보통 | 참고
+  type          String
+  range         String
+  reason        String
+  alternative   String
+  diffFromKorea String?
+  checkNeeded   String?
+  locations     String   @default("[]") // JSON 문자열 (SQLite는 스칼라 배열 미지원)
+  order         Int      @default(0) // 노출 정렬 순서
+
+  country   Country @relation(fields: [countryId], references: [id], onDelete: Cascade)
+  countryId String
+  city      City?   @relation(fields: [cityId], references: [id], onDelete: Cascade)
+  cityId    String? // null = 국가 공통
+
+  sources Source[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([countryId])
+  @@index([cityId])
+}
+
+// 출처 — "출처 기반" 신뢰 문구의 실체 (#3)
+model Source {
+  id        String    @id @default(cuid())
+  title     String // 출처 설명 (예: 오사카시 노상금연 조례)
+  url       String? // 공식 링크 (확인된 경우에만)
+  checkedAt DateTime? // 최종 확인일
+  warning   Warning   @relation(fields: [warningId], references: [id], onDelete: Cascade)
+  warningId String
+}
