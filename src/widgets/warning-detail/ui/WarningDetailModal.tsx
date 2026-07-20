@@ -8,6 +8,8 @@ import {
   Bookmark,
   BookmarkCheck,
   Share2,
+  FileText,
+  ExternalLink,
 } from 'lucide-react';
 import { getRiskStyles } from '@/shared/lib/risk';
 import type { Warning } from '@/entities/warning';
@@ -106,6 +108,35 @@ export const WarningDetailModal = ({
                   <h4 className="font-noto text-[13px] font-bold mb-1">확인 필요</h4>
                   <p className="font-noto text-[13px] leading-[1.5]">{item.checkNeeded}</p>
                 </div>
+              </div>
+            )}
+
+            {item.sources && item.sources.length > 0 && (
+              <div className="border-t border-gray-100 pt-6">
+                <h4 className="font-noto text-[14px] font-bold text-gray-800 mb-3 flex items-center gap-1.5">
+                  <FileText size={16} /> 출처
+                </h4>
+                <ul className="space-y-2">
+                  {item.sources.map((s, i) => (
+                    <li key={i} className="font-noto text-[13px] text-gray-600 leading-[1.5]">
+                      {s.url ? (
+                        <a
+                          href={s.url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="inline-flex items-center gap-1 text-gray-800 underline decoration-gray-300 hover:decoration-gray-800"
+                        >
+                          {s.title} <ExternalLink size={12} className="shrink-0" />
+                        </a>
+                      ) : (
+                        <span>{s.title}</span>
+                      )}
+                    </li>
+                  ))}
+                </ul>
+                <p className="font-noto text-[11px] text-gray-400 mt-3 leading-[1.5]">
+                  출처는 참고용이며, 규정은 변경될 수 있으니 방문 전 공식 안내를 확인하세요.
+                </p>
               </div>
             )}
           </div>
