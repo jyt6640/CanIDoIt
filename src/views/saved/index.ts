@@ -1,0 +1,1 @@
+export { SavedTripsView } from './ui/SavedTripsView';

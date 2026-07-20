@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import Link from 'next/link';
 import { ChevronDown, Menu, X } from 'lucide-react';
 
 interface NavigationProps {
@@ -29,9 +30,9 @@ export const Navigation = ({ onScrollToSearch }: NavigationProps) => {
 
       {/* Action Buttons */}
       <div className="flex items-center gap-2">
-        <button className="hidden md:flex items-center justify-center w-[110px] h-[42px] rounded-full hover:bg-black/5 transition-colors font-noto text-[14px] font-medium text-black">
+        <Link href="/saved" className="hidden md:flex items-center justify-center w-[110px] h-[42px] rounded-full hover:bg-black/5 transition-colors font-noto text-[14px] font-medium text-black">
           저장한 여행
-        </button>
+        </Link>
         <button
           onClick={onScrollToSearch}
           className="flex items-center justify-center w-auto px-6 md:w-[101px] h-[42px] rounded-full bg-black text-white hover:bg-gray-800 transition-colors font-noto text-[14px] font-medium"
@@ -62,12 +63,13 @@ export const Navigation = ({ onScrollToSearch }: NavigationProps) => {
                 {item}
               </button>
             ))}
-            <button
+            <Link
+              href="/saved"
               onClick={() => setMenuOpen(false)}
               className="px-5 py-3 text-left font-noto font-medium text-[15px] text-gray-800 hover:bg-gray-50 transition-colors border-t border-gray-100"
             >
               저장한 여행
-            </button>
+            </Link>
           </div>
         </div>
       )}
