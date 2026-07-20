@@ -19,6 +19,7 @@
     "seed": "node prisma/seed.mjs"
   },
   "dependencies": {
+    "@neondatabase/serverless": "^1.1.0",
     "@prisma/client": "^6.19.3",
     "eslint-config-next": "^16.2.10",
     "lucide-react": "^0.475.0",
