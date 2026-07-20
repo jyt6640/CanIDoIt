@@ -1,17 +1,7 @@
 import 'server-only';
 import { prisma } from '@/shared/db/prisma';
+import type { DestinationCountry } from '@/entities/destination';
 import type { Warning } from '../model/types';
-
-export interface DestinationCity {
-  name: string;
-  slug: string;
-}
-
-export interface DestinationCountry {
-  name: string;
-  slug: string;
-  cities: DestinationCity[];
-}
 
 export interface DestinationWarnings {
   country: { name: string; slug: string };
