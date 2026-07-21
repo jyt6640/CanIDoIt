@@ -13,13 +13,25 @@ export const isNvidiaNimConfigured = () => Boolean(process.env.NVIDIA_API_KEY);
 
 type ChatMessage = { role: 'system' | 'user' | 'assistant'; content: string };
 
+interface NimChatOptions {
+  model?: string;
+  maxTokens?: number;
+  timeoutMs?: number;
+}
+
 export async function nimChatJson<T>(
   messages: ChatMessage[],
   fallback: T,
-  model = nvidiaModels.search,
+  options: NimChatOptions = {},
 ): Promise<T> {
   const apiKey = process.env.NVIDIA_API_KEY;
   if (!apiKey) return fallback;
+
+  const {
+    model = nvidiaModels.search,
+    maxTokens = 700,
+    timeoutMs = 10_000,
+  } = options;
 
   try {
     const response = await fetch(`${NVIDIA_BASE_URL}/chat/completions`, {
@@ -32,10 +44,10 @@ export async function nimChatJson<T>(
         model,
         messages,
         temperature: 0.1,
-        max_tokens: 1200,
+        max_tokens: maxTokens,
         response_format: { type: 'json_object' },
       }),
-      signal: AbortSignal.timeout(15_000),
+      signal: AbortSignal.timeout(timeoutMs),
     });
 
     if (!response.ok) throw new Error(`NVIDIA NIM ${response.status}`);

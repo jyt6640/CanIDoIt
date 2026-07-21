@@ -19,7 +19,7 @@ type SearchResult = {
 };
 
 type SearchResponse = {
-  provider: 'nvidia-nim' | 'local-fallback';
+  provider: 'nvidia-nim' | 'local-fallback' | 'local-fast-path';
   model: string | null;
   answer: {
     verdict: 'ALLOWED' | 'PROHIBITED' | 'CONDITIONAL' | 'UNKNOWN';
@@ -117,7 +117,11 @@ export const BehaviorSearchView = () => {
               <div className="flex flex-wrap items-center justify-between gap-3">
                 <p className="text-sm font-bold text-lime-300">{verdictLabel[data.answer.verdict]}</p>
                 <p className="text-xs text-white/60">
-                  {data.provider === 'nvidia-nim' ? `NVIDIA NIM · ${data.model}` : '안전한 로컬 검색 폴백'}
+                  {data.provider === 'nvidia-nim'
+                    ? `NVIDIA NIM · ${data.model}`
+                    : data.provider === 'local-fast-path'
+                      ? '빠른 여행지 검색'
+                      : '안전한 로컬 검색 폴백'}
                 </p>
               </div>
               <p className="mt-4 text-lg leading-8">{data.answer.summary}</p>
