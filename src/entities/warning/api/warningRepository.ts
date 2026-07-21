@@ -82,19 +82,29 @@ function toWarning(w: PrismaWarning): Warning {
 /** 모든 국가와 도시 목록 (검색 셀렉트 / 정적 경로 생성용) */
 export const getCountries = cache(async (): Promise<DestinationCountry[]> => {
   const countries = await prisma.country.findMany({
-    orderBy: { name: 'asc' },
+    orderBy: [{ priorityScore: 'desc' }, { name: 'asc' }],
     include: {
-      regions: { orderBy: { name: 'asc' } },
-      cities: { orderBy: { name: 'asc' }, include: { region: true } },
+      regions: { orderBy: [{ priorityScore: 'desc' }, { name: 'asc' }] },
+      cities: { orderBy: [{ priorityScore: 'desc' }, { name: 'asc' }], include: { region: true } },
     },
   });
   return countries.map((c) => ({
     name: c.name,
     slug: c.slug,
-    regions: c.regions.map((region) => ({ name: region.name, slug: region.slug, type: region.type })),
+    priorityScore: c.priorityScore,
+    contentStatus: c.contentStatus,
+    prioritySource: c.prioritySource,
+    priorityCheckedAt: c.priorityCheckedAt?.toISOString() ?? null,
+    regions: c.regions.map((region) => ({
+      name: region.name, slug: region.slug, type: region.type,
+      priorityScore: region.priorityScore,
+      contentStatus: region.contentStatus,
+    })),
     cities: c.cities.map((city) => ({
       name: city.name,
       slug: city.slug,
+      priorityScore: city.priorityScore,
+      contentStatus: city.contentStatus,
       region: city.region ? { name: city.region.name, slug: city.region.slug, type: city.region.type } : null,
     })),
   }));
