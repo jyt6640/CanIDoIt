@@ -2,6 +2,7 @@
 // 국가/도시/주의사항/출처를 삽입한다. 멱등하도록 매 실행 시 초기화 후 재삽입.
 import { PrismaClient } from '@prisma/client';
 import { OFFICIAL_EXPANSION } from './seed-data/official-expansion.mjs';
+import { OFFICIAL_EXPANSION_V2 } from './seed-data/official-expansion-v2.mjs';
 import { REGION_CATALOG } from './seed-data/regions.mjs';
 import { CITY_PRIORITIES, COUNTRY_PRIORITIES, PRIORITY_SOURCE, REGION_PRIORITIES } from './seed-data/travel-priorities.mjs';
 import { CULTURAL_ETIQUETTE } from './seed-data/cultural-etiquette.mjs';
@@ -687,6 +688,7 @@ const DATA = [
     ],
   },
   ...OFFICIAL_EXPANSION,
+  ...OFFICIAL_EXPANSION_V2,
   ...CULTURAL_ETIQUETTE,
   ...COMMUNITY_CULTURAL_SIGNALS,
 ];
