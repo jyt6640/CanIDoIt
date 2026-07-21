@@ -102,4 +102,9 @@ export const REGION_CATALOG = {
     { name: '중부 크로아티아', slug: 'central', type: 'PROVINCE_GROUP', cities: ['zagreb'] },
     { name: '달마티아', slug: 'dalmatia', type: 'PROVINCE_GROUP', cities: ['dubrovnik', 'split'] },
   ],
+  italy: [
+    { name: '라치오', slug: 'lazio', type: 'PROVINCE', cities: ['rome'] },
+    { name: '롬바르디아', slug: 'lombardy', type: 'PROVINCE', cities: ['milano'] },
+    { name: '베네토', slug: 'veneto', type: 'PROVINCE', cities: ['venice'] },
+  ],
 };
