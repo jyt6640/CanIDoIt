@@ -1,4 +1,5 @@
 import { prisma } from '@/shared/db/prisma';
+import { requireAdmin } from '@/shared/admin/auth';
 
 const pretty = (value: unknown) => JSON.stringify(value, null, 2);
 
@@ -7,6 +8,8 @@ export default async function AdminDraftsPage({
 }: {
   searchParams: Promise<{ archived?: string }>;
 }) {
+  await requireAdmin();
+
   const messages = await searchParams;
   const [drafts, countries] = await Promise.all([
     prisma.contentDraft.findMany({
