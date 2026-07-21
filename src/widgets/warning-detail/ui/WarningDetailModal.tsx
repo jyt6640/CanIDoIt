@@ -44,6 +44,11 @@ export const WarningDetailModal = ({
   const verifiedDate = item.verifiedAt
     ? new Intl.DateTimeFormat('ko-KR', { dateStyle: 'medium' }).format(new Date(item.verifiedAt))
     : null;
+  const evidenceLabel = item.evidenceLevel === 'COMMUNITY_SIGNAL'
+    ? '여행자 경험 기반 · 검수 중'
+    : item.evidenceLevel === 'CORROBORATED'
+      ? '공식 안내와 독립 경험 교차 확인'
+      : '공식 출처 기반';
 
   return (
     <div className="fixed inset-0 z-50 flex items-end md:items-center justify-center p-0 md:p-4 animate-fade-in">
@@ -100,6 +105,12 @@ export const WarningDetailModal = ({
                   확인 주기가 지나 최신 공식 안내를 다시 확인해야 합니다.
                 </p>
               )}
+              <p className="mt-2 font-noto text-[12px] font-medium text-gray-700">{evidenceLabel}</p>
+              {(item.independentSourceCount ?? 0) > 1 && (
+                <p className="mt-1 font-noto text-[12px] text-gray-500">
+                  독립 출처 {item.independentSourceCount}개에서 반복 확인
+                </p>
+              )}
             </div>
             <div className="bg-gray-50 rounded-[16px] p-5">
               <h4 className="font-noto text-[14px] font-bold text-gray-800 mb-2 flex items-center gap-1.5">
@@ -107,6 +118,27 @@ export const WarningDetailModal = ({
               </h4>
               <p className="font-noto text-[15px] text-gray-700 leading-[1.6]">{item.reason}</p>
             </div>
+
+            {item.contextNotes && (
+              <div className="rounded-[16px] border border-violet-100 bg-violet-50/60 p-5">
+                <h4 className="mb-2 font-noto text-[14px] font-bold text-violet-900">언제 특히 민감한가요?</h4>
+                <p className="font-noto text-[14px] leading-[1.6] text-violet-900/80">{item.contextNotes}</p>
+              </div>
+            )}
+
+            {item.sideEffects && (
+              <div className="rounded-[16px] border border-orange-100 bg-orange-50/60 p-5">
+                <h4 className="mb-2 font-noto text-[14px] font-bold text-orange-900">실제로 생길 수 있는 부작용</h4>
+                <p className="font-noto text-[14px] leading-[1.6] text-orange-900/80">{item.sideEffects}</p>
+              </div>
+            )}
+
+            {item.counterpoint && (
+              <div className="rounded-[16px] border border-gray-200 bg-white p-5">
+                <h4 className="mb-2 font-noto text-[14px] font-bold text-gray-800">과장하지 않기</h4>
+                <p className="font-noto text-[14px] leading-[1.6] text-gray-600">{item.counterpoint}</p>
+              </div>
+            )}
 
             <div className="bg-[#5ae14c]/10 border border-[#5ae14c]/20 rounded-[16px] p-5">
               <h4 className="font-noto text-[14px] font-bold text-green-700 mb-2 flex items-center gap-1.5">

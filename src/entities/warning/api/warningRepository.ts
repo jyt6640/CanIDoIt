@@ -34,12 +34,23 @@ type PrismaWarning = {
   keywords: string[];
   aliases: string[];
   legacyKeys: string[];
-  sources: { title: string; url: string | null; checkedAt: Date | null }[];
+  sources: {
+    title: string;
+    url: string | null;
+    checkedAt: Date | null;
+    kind: 'OFFICIAL' | 'GOVERNMENT_ADVISORY' | 'COMMUNITY' | 'WIKI' | 'EDITORIAL';
+    platform: string | null;
+  }[];
   status: 'DRAFT' | 'REVIEWING' | 'VERIFIED' | 'STALE' | 'ARCHIVED';
   verifiedAt: Date | null;
   expiresAt: Date | null;
   reviewedBy: string | null;
   confidence: number | null;
+  evidenceLevel: 'OFFICIAL' | 'CORROBORATED' | 'COMMUNITY_SIGNAL';
+  contextNotes: string | null;
+  sideEffects: string | null;
+  counterpoint: string | null;
+  independentSourceCount: number;
 };
 
 const RISK_LABEL: Record<PrismaWarning['risk'], string> = {
@@ -70,12 +81,19 @@ function toWarning(w: PrismaWarning): Warning {
       title: s.title,
       url: s.url,
       checkedAt: s.checkedAt ? s.checkedAt.toISOString() : null,
+      kind: s.kind,
+      platform: s.platform,
     })),
     status: w.expiresAt && w.expiresAt < new Date() && w.status === 'VERIFIED' ? 'STALE' : w.status,
     verifiedAt: w.verifiedAt?.toISOString() ?? null,
     expiresAt: w.expiresAt?.toISOString() ?? null,
     reviewedBy: w.reviewedBy,
     confidence: w.confidence,
+    evidenceLevel: w.evidenceLevel,
+    contextNotes: w.contextNotes,
+    sideEffects: w.sideEffects,
+    counterpoint: w.counterpoint,
+    independentSourceCount: w.independentSourceCount,
   };
 }
 

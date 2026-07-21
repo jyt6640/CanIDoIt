@@ -2,6 +2,8 @@ export interface WarningSource {
   title: string;
   url?: string | null;
   checkedAt?: string | null;
+  kind?: 'OFFICIAL' | 'GOVERNMENT_ADVISORY' | 'COMMUNITY' | 'WIKI' | 'EDITORIAL';
+  platform?: string | null;
 }
 
 export interface Warning {
@@ -25,4 +27,9 @@ export interface Warning {
   expiresAt?: string | null;
   reviewedBy?: string | null;
   confidence?: number | null;
+  evidenceLevel?: 'OFFICIAL' | 'CORROBORATED' | 'COMMUNITY_SIGNAL';
+  contextNotes?: string | null;
+  sideEffects?: string | null;
+  counterpoint?: string | null;
+  independentSourceCount?: number;
 }

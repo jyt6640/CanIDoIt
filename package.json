@@ -23,7 +23,8 @@
     "content:draft": "node scripts/draft-content-from-snapshot.mjs",
     "content:source:add": "node scripts/register-official-source.mjs",
     "content:audit": "node scripts/audit-sources.mjs",
-    "content:audit:apply": "node scripts/enforce-source-trust.mjs"
+    "content:audit:apply": "node scripts/enforce-source-trust.mjs",
+    "content:community:audit": "node scripts/audit-community-evidence.mjs"
   },
   "prisma": {
     "seed": "node prisma/seed.mjs"
