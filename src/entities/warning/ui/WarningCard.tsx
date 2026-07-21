@@ -1,4 +1,4 @@
-import { Bookmark, BookmarkCheck, ArrowRight } from 'lucide-react';
+import { Bookmark, BookmarkCheck, ArrowRight, ExternalLink, ShieldCheck } from 'lucide-react';
 import { getRiskStyles } from '@/shared/lib/risk';
 import type { Warning } from '../model/types';
 
@@ -12,6 +12,16 @@ interface WarningCardProps {
 export const WarningCard = ({ item, isSaved, onToggleSave, onClick }: WarningCardProps) => {
   const styles = getRiskStyles(item.risk);
   const RiskIcon = styles.icon;
+  const linkedSources = (item.sources ?? []).filter((source) => source.url);
+  const firstSource = linkedSources[0];
+  const statusLabel = item.status === 'VERIFIED'
+    ? '검수 완료'
+    : item.status === 'STALE'
+      ? '재검토 필요'
+      : '검수 중';
+  const verifiedDate = item.verifiedAt
+    ? new Intl.DateTimeFormat('ko-KR', { year: 'numeric', month: 'numeric', day: 'numeric' }).format(new Date(item.verifiedAt))
+    : null;
 
   return (
     <div
@@ -49,6 +59,27 @@ export const WarningCard = ({ item, isSaved, onToggleSave, onClick }: WarningCar
       <p className="font-noto text-[14px] text-gray-600 leading-[1.5] mb-5 line-clamp-2 flex-grow">
         {item.reason || item.alternative}
       </p>
+
+      <div className="mb-4 flex flex-wrap items-center gap-x-3 gap-y-2 rounded-xl bg-gray-50 px-3 py-2.5 text-[11px] text-gray-600">
+        <span className="inline-flex items-center gap-1 font-noto font-semibold text-gray-700">
+          <ShieldCheck size={13} /> {statusLabel}
+        </span>
+        {firstSource ? (
+          <a
+            href={firstSource.url ?? undefined}
+            target="_blank"
+            rel="noreferrer"
+            onClick={(event) => event.stopPropagation()}
+            className="inline-flex items-center gap-1 font-noto font-semibold text-blue-700 hover:underline"
+            aria-label={`공식 출처 ${linkedSources.length}개 보기`}
+          >
+            공식 출처 {linkedSources.length}개 <ExternalLink size={11} />
+          </a>
+        ) : (
+          <span className="font-noto text-amber-700">출처 확인 중</span>
+        )}
+        {verifiedDate && <span className="font-noto text-gray-500">최종 확인 {verifiedDate}</span>}
+      </div>
 
       <div className="pt-4 border-t border-gray-100 mt-auto flex justify-between items-center">
         <div className="flex flex-col gap-0.5">
