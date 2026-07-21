@@ -20,7 +20,10 @@
     "deploy:migrate": "prisma migrate deploy",
     "db:dedupe": "node scripts/dedupe-warnings.mjs",
     "content:collect": "node scripts/collect-official-source.mjs",
-    "content:draft": "node scripts/draft-content-from-snapshot.mjs"
+    "content:draft": "node scripts/draft-content-from-snapshot.mjs",
+    "content:source:add": "node scripts/register-official-source.mjs",
+    "content:audit": "node scripts/audit-sources.mjs",
+    "content:audit:apply": "node scripts/enforce-source-trust.mjs"
   },
   "prisma": {
     "seed": "node prisma/seed.mjs"
