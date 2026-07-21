@@ -7,6 +7,7 @@ import type { Warning } from '../model/types';
 export interface DestinationWarnings {
   country: { name: string; slug: string };
   city: { name: string; slug: string } | null;
+  region: { name: string; slug: string; type: string } | null;
   warnings: Warning[];
 }
 
@@ -14,6 +15,7 @@ export interface SavedWarningRecord {
   warning: Warning;
   country: { name: string; slug: string };
   city: { name: string; slug: string } | null;
+  region: { name: string; slug: string; type: string } | null;
 }
 
 type PrismaWarning = {
@@ -81,12 +83,20 @@ function toWarning(w: PrismaWarning): Warning {
 export const getCountries = cache(async (): Promise<DestinationCountry[]> => {
   const countries = await prisma.country.findMany({
     orderBy: { name: 'asc' },
-    include: { cities: { orderBy: { name: 'asc' } } },
+    include: {
+      regions: { orderBy: { name: 'asc' } },
+      cities: { orderBy: { name: 'asc' }, include: { region: true } },
+    },
   });
   return countries.map((c) => ({
     name: c.name,
     slug: c.slug,
-    cities: c.cities.map((city) => ({ name: city.name, slug: city.slug })),
+    regions: c.regions.map((region) => ({ name: region.name, slug: region.slug, type: region.type })),
+    cities: c.cities.map((city) => ({
+      name: city.name,
+      slug: city.slug,
+      region: city.region ? { name: city.region.name, slug: city.region.slug, type: city.region.type } : null,
+    })),
   }));
 });
 
@@ -102,15 +112,15 @@ export const getDestinationWarnings = cache(async (
 ): Promise<DestinationWarnings | null> => {
   const country = await prisma.country.findUnique({
     where: { slug: countrySlug },
-    include: { cities: true },
+    include: { cities: { include: { region: true } } },
   });
   if (!country) return null;
 
-  let city: { id: string; name: string; slug: string } | null = null;
+  let city: { id: string; name: string; slug: string; region: { id: string; name: string; slug: string; type: string } | null } | null = null;
   if (citySlug) {
     const found = country.cities.find((c) => c.slug === citySlug);
     if (!found) return null;
-    city = { id: found.id, name: found.name, slug: found.slug };
+    city = { id: found.id, name: found.name, slug: found.slug, region: found.region };
   }
 
   const warnings = await prisma.warning.findMany({
@@ -119,7 +129,15 @@ export const getDestinationWarnings = cache(async (
       archived: false,
       status: { in: ['VERIFIED', 'STALE', 'REVIEWING'] },
       // 도시 지정 시: 국가 공통(cityId null) + 해당 도시. 미지정 시: 국가 공통만.
-      ...(city ? { OR: [{ cityId: null }, { cityId: city.id }] } : { cityId: null }),
+      ...(city
+        ? {
+            OR: [
+              { cityId: null, regionId: null },
+              ...(city.region ? [{ cityId: null, regionId: city.region.id }] : []),
+              { cityId: city.id },
+            ],
+          }
+        : { cityId: null, regionId: null }),
     },
     orderBy: { order: 'asc' },
     include: { sources: true },
@@ -128,6 +146,7 @@ export const getDestinationWarnings = cache(async (
   return {
     country: { name: country.name, slug: country.slug },
     city: city ? { name: city.name, slug: city.slug } : null,
+    region: city?.region ? { name: city.region.name, slug: city.region.slug, type: city.region.type } : null,
     warnings: warnings.map(toWarning),
   };
 });
@@ -139,12 +158,13 @@ export const getAllPublicWarnings = cache(async (): Promise<SavedWarningRecord[]
       status: { in: ['VERIFIED', 'STALE', 'REVIEWING'] },
     },
     orderBy: [{ country: { name: 'asc' } }, { city: { name: 'asc' } }, { order: 'asc' }],
-    include: { sources: true, country: true, city: true },
+    include: { sources: true, country: true, city: true, region: true },
   });
 
   return warnings.map((warning) => ({
     warning: toWarning(warning),
     country: { name: warning.country.name, slug: warning.country.slug },
     city: warning.city ? { name: warning.city.name, slug: warning.city.slug } : null,
+    region: warning.region ? { name: warning.region.name, slug: warning.region.slug, type: warning.region.type } : null,
   }));
 });

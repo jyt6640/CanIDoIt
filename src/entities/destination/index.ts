@@ -1,1 +1,1 @@
-export type { DestinationCity, DestinationCountry } from './model/types';
+export type { DestinationCity, DestinationCountry, DestinationRegion } from './model/types';

@@ -5,6 +5,7 @@ import type { SavedWarningRecord } from '@/entities/warning/api/warningRepositor
 const record = (title: string, country: string, key: string): SavedWarningRecord => ({
   country: { name: country, slug: country.toLowerCase() },
   city: null,
+  region: null,
   warning: {
     id: key,
     title,

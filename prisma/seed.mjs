@@ -2,6 +2,7 @@
 // 국가/도시/주의사항/출처를 삽입한다. 멱등하도록 매 실행 시 초기화 후 재삽입.
 import { PrismaClient } from '@prisma/client';
 import { OFFICIAL_EXPANSION } from './seed-data/official-expansion.mjs';
+import { REGION_CATALOG } from './seed-data/regions.mjs';
 
 const prisma = new PrismaClient();
 
@@ -698,11 +699,24 @@ async function main() {
     });
 
     const cities = [];
+    const regions = [];
+    for (const regionData of REGION_CATALOG[c.slug] ?? []) {
+      regions.push(await prisma.region.upsert({
+        where: { countryId_slug: { countryId: country.id, slug: regionData.slug } },
+        update: { name: regionData.name, type: regionData.type },
+        create: { name: regionData.name, slug: regionData.slug, type: regionData.type, countryId: country.id },
+      }));
+    }
+    const regionSlugToId = Object.fromEntries(regions.map((region) => [region.slug, region.id]));
+    const cityToRegionSlug = Object.fromEntries(
+      (REGION_CATALOG[c.slug] ?? []).flatMap((region) => region.cities.map((city) => [city, region.slug])),
+    );
     for (const cityData of c.cities) {
+      const regionId = cityToRegionSlug[cityData.slug] ? regionSlugToId[cityToRegionSlug[cityData.slug]] : null;
       cities.push(await prisma.city.upsert({
         where: { countryId_slug: { countryId: country.id, slug: cityData.slug } },
-        update: { name: cityData.name },
-        create: { name: cityData.name, slug: cityData.slug, countryId: country.id },
+        update: { name: cityData.name, regionId },
+        create: { name: cityData.name, slug: cityData.slug, countryId: country.id, regionId },
       }));
     }
     const citySlugToId = Object.fromEntries(cities.map((city) => [city.slug, city.id]));
@@ -732,6 +746,7 @@ async function main() {
           confidence: (w.sources ?? []).some((source) => source.url) ? 95 : 70,
           countryId: country.id,
           cityId: w.city ? (citySlugToId[w.city] ?? null) : null,
+          regionId: w.region ? (regionSlugToId[w.region] ?? null) : null,
       };
       const sources = (w.sources ?? []).map((s) => ({
               title: s.title,
