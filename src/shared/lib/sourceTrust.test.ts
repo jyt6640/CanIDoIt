@@ -36,4 +36,18 @@ describe('source trust', () => {
   it('정확히 gov.uk인 루트 도메인도 공식 도메인으로 판정한다', () => {
     expect(isLikelyOfficialHostname('gov.uk')).toBe(true);
   });
+
+  it('커뮤니티 출처를 공식 도메인과 구분한다', () => {
+    const result = evaluateSourceTrust(
+      {
+        title: '여행자 후기',
+        url: 'https://www.reddit.com/r/travel/example',
+        checkedAt: '2026-07-21T00:00:00.000Z',
+        kind: 'COMMUNITY',
+      },
+      new Date('2026-07-21T00:00:00.000Z'),
+    );
+    expect(result.level).toBe('COMMUNITY');
+    expect(result.label).toBe('여행자 후기');
+  });
 });

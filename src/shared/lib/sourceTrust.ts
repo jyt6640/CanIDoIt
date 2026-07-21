@@ -2,6 +2,7 @@ interface SourceLike {
   title: string;
   url?: string | null;
   checkedAt?: string | null;
+  kind?: 'OFFICIAL' | 'GOVERNMENT_ADVISORY' | 'COMMUNITY' | 'WIKI' | 'EDITORIAL';
 }
 
 const OFFICIAL_HOSTS = new Set([
@@ -57,7 +58,14 @@ const OFFICIAL_SUFFIXES = [
   '.go.id',
 ];
 
-export type SourceTrustLevel = 'OFFICIAL_DOMAIN' | 'HTTPS_SOURCE' | 'NEEDS_REVIEW' | 'INVALID';
+export type SourceTrustLevel =
+  | 'OFFICIAL_DOMAIN'
+  | 'HTTPS_SOURCE'
+  | 'COMMUNITY'
+  | 'WIKI'
+  | 'EDITORIAL'
+  | 'NEEDS_REVIEW'
+  | 'INVALID';
 
 export interface SourceTrustSummary {
   level: SourceTrustLevel;
@@ -98,6 +106,16 @@ export const evaluateSourceTrust = (
   const checkedTime = checkedAt && !Number.isNaN(checkedAt.getTime()) ? checkedAt.getTime() : null;
   const staleAfterMs = 180 * 24 * 60 * 60 * 1000;
   const isStale = checkedTime === null || now.getTime() - checkedTime > staleAfterMs;
+
+  if (source.kind === 'COMMUNITY') {
+    return { level: 'COMMUNITY', label: '여행자 후기', hostname, isSecure, isStale };
+  }
+  if (source.kind === 'WIKI') {
+    return { level: 'WIKI', label: '위키 참고', hostname, isSecure, isStale };
+  }
+  if (source.kind === 'EDITORIAL') {
+    return { level: 'EDITORIAL', label: '편집·여행 매체', hostname, isSecure, isStale };
+  }
 
   if (isSecure && isLikelyOfficialHostname(hostname)) {
     return { level: 'OFFICIAL_DOMAIN', label: '공식 도메인', hostname, isSecure, isStale };

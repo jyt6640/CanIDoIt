@@ -46,6 +46,20 @@ enum ContentAvailability {
   NO_VERIFIED_DATA
 }
 
+enum EvidenceLevel {
+  OFFICIAL
+  CORROBORATED
+  COMMUNITY_SIGNAL
+}
+
+enum SourceKind {
+  OFFICIAL
+  GOVERNMENT_ADVISORY
+  COMMUNITY
+  WIKI
+  EDITORIAL
+}
+
 model Country {
   id       String    @id @default(cuid())
   name     String    @unique // 표시명 (예: 일본)
@@ -103,6 +117,11 @@ model Warning {
   expiresAt     DateTime?
   reviewedBy    String?
   confidence    Int?
+  evidenceLevel EvidenceLevel @default(OFFICIAL)
+  contextNotes  String?
+  sideEffects   String?
+  counterpoint  String?
+  independentSourceCount Int @default(0)
   title         String
   category      String
   risk          RiskLevel
@@ -192,6 +211,8 @@ model Source {
   title     String // 출처 설명 (예: 오사카시 노상금연 조례)
   url       String? // 공식 링크 (확인된 경우에만)
   checkedAt DateTime? // 최종 확인일
+  kind      SourceKind @default(OFFICIAL)
+  platform  String?
   warning   Warning   @relation(fields: [warningId], references: [id], onDelete: Cascade)
   warningId String
 }

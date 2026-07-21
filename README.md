@@ -116,3 +116,11 @@ src/
 한국인 여행 수요를 기준으로 한 국가·지역·도시 확장 순서는 [`docs/destination-priority.md`](docs/destination-priority.md)에 정리되어 있습니다. 화면의 `인기` 표시는 공식 방문객 순위가 아니라 공개 통계와 검증 데이터 보유량을 함께 반영한 편집 우선순위입니다.
 
 문화·제스처·종교 예절 데이터의 검수 원칙은 [`docs/cultural-content-policy.md`](docs/cultural-content-policy.md)에 정리되어 있습니다. 출처가 불명확한 제스처 속설은 공개하지 않고, 법률·시설 규칙·일반 매너를 구분해 표현합니다.
+
+여행객 후기·커뮤니티·사용자 편집 위키는 문화 신호를 찾는 보조 자료로만 사용합니다. 신뢰 등급, 독립 출처 수, 반례 기록 기준은 [`docs/community-evidence-policy.md`](docs/community-evidence-policy.md)에 정리되어 있습니다.
+
+```bash
+npm run content:community:audit
+```
+
+이 감사 명령은 여행자 경험 기반 항목이 `VERIFIED`로 잘못 공개됐는지, 독립 출처가 2개 미만인지, 맥락·부작용·반례가 빠졌는지 검사합니다.

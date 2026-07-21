@@ -5,6 +5,7 @@ import { OFFICIAL_EXPANSION } from './seed-data/official-expansion.mjs';
 import { REGION_CATALOG } from './seed-data/regions.mjs';
 import { CITY_PRIORITIES, COUNTRY_PRIORITIES, PRIORITY_SOURCE, REGION_PRIORITIES } from './seed-data/travel-priorities.mjs';
 import { CULTURAL_ETIQUETTE } from './seed-data/cultural-etiquette.mjs';
+import { COMMUNITY_CULTURAL_SIGNALS } from './seed-data/community-cultural-signals.mjs';
 
 const prisma = new PrismaClient();
 
@@ -687,6 +688,7 @@ const DATA = [
   },
   ...OFFICIAL_EXPANSION,
   ...CULTURAL_ETIQUETTE,
+  ...COMMUNITY_CULTURAL_SIGNALS,
 ];
 
 async function main() {
@@ -770,13 +772,24 @@ async function main() {
           locations: w.locations ?? [],
           keywords: Array.from(new Set([w.category, w.type, ...(w.locations ?? [])])),
           aliases: [w.title.replace(/(하지|마세요|않도록|금지).*/g, '').trim()].filter(Boolean),
+          evidenceLevel: w.evidenceLevel ?? 'OFFICIAL',
+          contextNotes: w.contextNotes ?? null,
+          sideEffects: w.sideEffects ?? null,
+          counterpoint: w.counterpoint ?? null,
+          independentSourceCount: w.independentSourceCount ?? (w.sources ?? []).length,
           order: order++,
           archived: false,
-          status: (w.sources ?? []).length > 0 ? 'VERIFIED' : 'REVIEWING',
-          verifiedAt: (w.sources ?? []).length > 0 ? new Date('2026-07-18T00:00:00.000Z') : null,
-          expiresAt: (w.sources ?? []).length > 0 ? new Date('2026-10-16T00:00:00.000Z') : null,
-          reviewedBy: (w.sources ?? []).length > 0 ? 'content-team' : null,
-          confidence: (w.sources ?? []).some((source) => source.url) ? 95 : 70,
+          status: w.status ?? ((w.sources ?? []).length > 0 ? 'VERIFIED' : 'REVIEWING'),
+          verifiedAt: (w.status ?? ((w.sources ?? []).length > 0 ? 'VERIFIED' : 'REVIEWING')) === 'VERIFIED'
+            ? new Date('2026-07-18T00:00:00.000Z')
+            : null,
+          expiresAt: (w.status ?? ((w.sources ?? []).length > 0 ? 'VERIFIED' : 'REVIEWING')) === 'VERIFIED'
+            ? new Date('2026-10-16T00:00:00.000Z')
+            : null,
+          reviewedBy: (w.status ?? ((w.sources ?? []).length > 0 ? 'VERIFIED' : 'REVIEWING')) === 'VERIFIED'
+            ? 'content-team'
+            : null,
+          confidence: w.confidence ?? ((w.sources ?? []).some((source) => source.url) ? 95 : 70),
           countryId: country.id,
           cityId: w.city ? (citySlugToId[w.city] ?? null) : null,
           regionId: w.region ? (regionSlugToId[w.region] ?? null) : null,
@@ -785,6 +798,8 @@ async function main() {
               title: s.title,
               url: s.url ?? null,
               checkedAt: s.checkedAt ? new Date(s.checkedAt) : null,
+              kind: s.kind ?? 'OFFICIAL',
+              platform: s.platform ?? null,
       }));
 
       await prisma.warning.upsert({
