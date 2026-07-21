@@ -9,6 +9,7 @@ interface NavigationProps {
 }
 
 const MENU_ITEMS = [
+  { label: '데이터 투명성', href: '/transparency' },
   { label: '이용약관', href: '/terms' },
   { label: '개인정보처리방침', href: '/privacy' },
   { label: '문의', href: 'https://github.com/jyt6640/CanIDoIt/issues/new' },

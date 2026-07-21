@@ -48,11 +48,22 @@ NVIDIA_RERANK_MODEL=nvidia/llama-nemotron-rerank-1b-v2
 공식 출처 파이프라인은 등록된 `OfficialSource`만 수집합니다.
 
 ```bash
+npm run content:source:add -- AU "Australian Border Force" customs en https://www.abf.gov.au/...
 npm run content:collect -- https://official.example/page
 npm run content:draft -- <snapshot-id>
+npm run content:audit
+npm run content:audit:apply
 ```
 
-원문 해시가 달라진 문서만 변경으로 표시되고, AI가 생성한 후보는 원문에 실제 존재하는 근거 문장이 검증된 경우에만 `REVIEWING` 초안으로 저장됩니다. 공개는 관리자 검수 후 별도로 진행해야 합니다.
+`content:source:add`는 국가 코드, 기관명, 출처 유형, 언어, HTTPS URL을 `OfficialSource`에 등록합니다. `content:collect`는 등록된 URL만 요청해 HTML에서 본문을 추출하고 SHA-256 해시를 저장합니다. 이전 스냅샷과 해시가 달라진 문서만 변경으로 표시됩니다.
+
+`content:draft`는 NVIDIA 추출 모델로 규정 후보를 구조화합니다. AI가 제시한 근거 문장이 수집 원문에 실제 존재하는 경우에만 `REVIEWING` 초안으로 저장되며 자동 공개하지 않습니다. 검수자가 출처, 적용 범위, 표현을 확인한 뒤에만 `VERIFIED` 상태로 공개합니다.
+
+`content:audit`는 현재 Warning 출처 전체를 검사해 잘못된 URL, HTTP 링크, 공식 도메인으로 확인되지 않은 링크, 180일 이상 지난 확인일을 JSON 리포트로 출력합니다. 도메인 휴리스틱은 보조 신호이며, 최종 공식성 판단은 기관 페이지와 담당자가 검수해야 합니다.
+
+`content:audit:apply`는 URL이 없는 `VERIFIED` 항목을 `REVIEWING`으로 내리고, 유효한 출처가 있어도 확인일이 모두 180일 이상 지난 항목을 `STALE`로 표시합니다. 자동 실행 전에는 반드시 `content:audit` 결과를 먼저 검토해야 합니다.
+
+서비스 화면의 `/transparency`에서도 이 파이프라인과 공개 기준을 확인할 수 있습니다.
 
 기존 Seed 전환 과정에서 생긴 동일 국가·도시·제목 중복은 다음 명령으로 안정 키 레코드에 병합합니다.
 

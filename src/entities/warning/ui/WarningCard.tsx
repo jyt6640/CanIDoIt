@@ -1,5 +1,6 @@
 import { Bookmark, BookmarkCheck, ArrowRight, ExternalLink, ShieldCheck } from 'lucide-react';
 import { getRiskStyles } from '@/shared/lib/risk';
+import { evaluateSourceTrust } from '@/shared/lib/sourceTrust';
 import type { Warning } from '../model/types';
 
 interface WarningCardProps {
@@ -14,6 +15,7 @@ export const WarningCard = ({ item, isSaved, onToggleSave, onClick }: WarningCar
   const RiskIcon = styles.icon;
   const linkedSources = (item.sources ?? []).filter((source) => source.url);
   const firstSource = linkedSources[0];
+  const firstSourceTrust = firstSource ? evaluateSourceTrust(firstSource) : null;
   const statusLabel = item.status === 'VERIFIED'
     ? '검수 완료'
     : item.status === 'STALE'
@@ -71,12 +73,29 @@ export const WarningCard = ({ item, isSaved, onToggleSave, onClick }: WarningCar
             rel="noreferrer"
             onClick={(event) => event.stopPropagation()}
             className="inline-flex items-center gap-1 font-noto font-semibold text-blue-700 hover:underline"
-            aria-label={`공식 출처 ${linkedSources.length}개 보기`}
+            aria-label={`${firstSource.title} 출처 열기`}
           >
-            공식 출처 {linkedSources.length}개 <ExternalLink size={11} />
+            <span className="max-w-[150px] truncate">{firstSource.title}</span>
+            <span className="text-gray-500">· {firstSourceTrust?.hostname}</span>
+            <ExternalLink size={11} />
           </a>
         ) : (
           <span className="font-noto text-amber-700">출처 확인 중</span>
+        )}
+        {firstSourceTrust && (
+          <span
+            className={firstSourceTrust.level === 'OFFICIAL_DOMAIN'
+              ? 'font-noto font-semibold text-emerald-700'
+              : firstSourceTrust.level === 'HTTPS_SOURCE'
+                ? 'font-noto font-semibold text-blue-700'
+                : 'font-noto font-semibold text-amber-700'}
+          >
+            {firstSourceTrust.label}
+            {firstSourceTrust.isStale ? ' · 재확인 필요' : ''}
+          </span>
+        )}
+        {linkedSources.length > 1 && (
+          <span className="font-noto text-gray-500">외 {linkedSources.length - 1}개</span>
         )}
         {verifiedDate && <span className="font-noto text-gray-500">최종 확인 {verifiedDate}</span>}
       </div>

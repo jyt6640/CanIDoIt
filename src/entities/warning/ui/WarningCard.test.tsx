@@ -31,17 +31,21 @@ describe('WarningCard', () => {
     expect(screen.getByText('매우 높음')).toBeInTheDocument();
     expect(screen.getByText('오사카')).toBeInTheDocument();
     expect(screen.getByText('검수 완료')).toBeInTheDocument();
-    expect(screen.getByRole('link', { name: '공식 출처 1개 보기' })).toHaveAttribute(
+    expect(screen.getByRole('link', { name: '오사카시 공식 안내 출처 열기' })).toHaveAttribute(
       'href',
       'https://www.city.osaka.lg.jp/',
     );
+    expect(screen.getByRole('link', { name: '오사카시 공식 안내 출처 열기' })).toHaveTextContent(
+      'city.osaka.lg.jp',
+    );
+    expect(screen.getByText('공식 도메인')).toBeInTheDocument();
     expect(screen.getByText(/최종 확인/)).toBeInTheDocument();
   });
 
   it('공식 출처 링크 클릭 시 카드 상세 열기를 막는다', () => {
     const onClick = vi.fn();
     render(<WarningCard item={item} isSaved={false} onToggleSave={() => {}} onClick={onClick} />);
-    fireEvent.click(screen.getByRole('link', { name: '공식 출처 1개 보기' }));
+    fireEvent.click(screen.getByRole('link', { name: '오사카시 공식 안내 출처 열기' }));
     expect(onClick).not.toHaveBeenCalled();
   });
 

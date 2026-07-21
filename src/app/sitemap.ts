@@ -4,7 +4,7 @@ import { DESTINATION_ROUTES } from '@/shared/config/routes';
 
 export default function sitemap(): MetadataRoute.Sitemap {
   const now = new Date();
-  const staticRoutes = ['', '/saved', '/search', '/terms', '/privacy'];
+  const staticRoutes = ['', '/saved', '/search', '/transparency', '/terms', '/privacy'];
   return [
     ...staticRoutes.map((path) => ({ url: `${env.siteUrl}${path}`, lastModified: now, changeFrequency: 'weekly' as const })),
     ...DESTINATION_ROUTES.flatMap(({ country, cities }) => [
