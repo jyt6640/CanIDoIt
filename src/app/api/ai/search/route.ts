@@ -13,6 +13,21 @@ interface AiAnswer {
   warningKeys: string[];
 }
 
+const normalize = (value: string) =>
+  value.toLocaleLowerCase('ko-KR').replace(/[^\p{L}\p{N}]+/gu, '').trim();
+
+function isDestinationOnlyQuery(
+  question: string,
+  records: Awaited<ReturnType<typeof getAllPublicWarnings>>,
+) {
+  const normalizedQuestion = normalize(question);
+  if (!normalizedQuestion || normalizedQuestion.length > 16) return false;
+
+  return records.some(({ country, city }) =>
+    normalize(country.name) === normalizedQuestion || normalize(city?.name ?? '') === normalizedQuestion,
+  );
+}
+
 export async function POST(request: Request) {
   const body = await request.json().catch(() => null) as { question?: unknown } | null;
   const question = typeof body?.question === 'string' ? body.question.trim().slice(0, 500) : '';
@@ -20,17 +35,25 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: '질문을 두 글자 이상 입력해 주세요.' }, { status: 400 });
   }
 
-  const fallbackParsed = fallbackParseQuestion(question);
-  const parsed = await nimChatJson<ParsedTravelQuestion>([
-    {
-      role: 'system',
-      content: '여행 규정 질문을 검색 조건으로만 구조화하라. 새 법률이나 사실을 만들지 마라. JSON 필드: country, city, actions(string[]), categories(string[]), intent(ALLOWANCE|RULE|SAFETY|UNKNOWN).',
-    },
-    { role: 'user', content: question },
-  ], fallbackParsed);
-
   const records = await getAllPublicWarnings();
-  const hits = rankWarnings(records, question, parsed, 6);
+  const fallbackParsed = fallbackParseQuestion(question);
+  const directHits = rankWarnings(records, question, fallbackParsed, 6);
+  const destinationOnly = isDestinationOnlyQuery(question, records);
+
+  let parsed = fallbackParsed;
+  let hits = directHits;
+
+  // 단순 국가·도시 검색 또는 로컬 검색 결과가 충분하면 해석용 AI 호출을 생략한다.
+  if (!destinationOnly && (directHits[0]?.score ?? 0) < 6) {
+    parsed = await nimChatJson<ParsedTravelQuestion>([
+      {
+        role: 'system',
+        content: '여행 규정 질문을 검색 조건으로만 구조화하라. 새 법률이나 사실을 만들지 마라. JSON 필드: country, city, actions(string[]), categories(string[]), intent(ALLOWANCE|RULE|SAFETY|UNKNOWN).',
+      },
+      { role: 'user', content: question },
+    ], fallbackParsed, { maxTokens: 300, timeoutMs: 6_000 });
+    hits = rankWarnings(records, question, parsed, 6);
+  }
   const evidence = hits.map(({ warning, country, city }) => ({
     warningKey: warning.id,
     destination: `${country.name}${city ? ` ${city.name}` : ''}`,
@@ -54,22 +77,26 @@ export async function POST(request: Request) {
         warningKeys: [],
       };
 
-  const answer = evidence.length
+  const answer = evidence.length && !destinationOnly
     ? await nimChatJson<AiAnswer>([
         {
           role: 'system',
           content: '제공된 evidence 밖의 규정, 벌금, 형량, 날짜를 만들지 마라. 결론은 ALLOWED, PROHIBITED, CONDITIONAL, UNKNOWN 중 하나다. summary는 한국어 3문장 이내로 작성하고 warningKeys에는 실제 evidence의 warningKey만 넣어라.',
         },
         { role: 'user', content: JSON.stringify({ question, evidence }) },
-      ], fallbackAnswer)
+      ], fallbackAnswer, { maxTokens: 500, timeoutMs: 8_000 })
     : fallbackAnswer;
 
   const allowedKeys = new Set(evidence.map((item) => item.warningKey));
   const safeKeys = answer.warningKeys.filter((key) => allowedKeys.has(key));
 
   return NextResponse.json({
-    provider: isNvidiaNimConfigured() ? 'nvidia-nim' : 'local-fallback',
-    model: isNvidiaNimConfigured() ? nvidiaModels.search : null,
+    provider: destinationOnly
+      ? 'local-fast-path'
+      : isNvidiaNimConfigured()
+        ? 'nvidia-nim'
+        : 'local-fallback',
+    model: !destinationOnly && isNvidiaNimConfigured() ? nvidiaModels.search : null,
     parsed,
     answer: { ...answer, warningKeys: safeKeys.length ? safeKeys : fallbackAnswer.warningKeys },
     results: hits.map(({ warning, country, city, score }) => ({
