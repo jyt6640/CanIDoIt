@@ -6,13 +6,19 @@ import { REGION_CATALOG } from '../prisma/seed-data/regions.mjs';
 const prisma = new PrismaClient();
 const batchName = process.argv[2];
 const dryRun = process.argv.includes('--dry-run');
+const countryOptionIndex = process.argv.indexOf('--country');
+const countrySlug = countryOptionIndex >= 0 ? process.argv[countryOptionIndex + 1] : null;
 const ALLOWED_BATCHES = new Map([
   ['official-expansion-v2', ['official-expansion-v2.mjs', 'OFFICIAL_EXPANSION_V2']],
   ['cultural-signals-bulk-v2', ['cultural-signals-bulk-v2.mjs', 'CULTURAL_SIGNALS_BULK_V2']],
 ]);
 
 if (!batchName || !ALLOWED_BATCHES.has(batchName)) {
-  console.error(`Usage: npm run db:batch -- <${[...ALLOWED_BATCHES.keys()].join('|')}> [--dry-run]`);
+  console.error(`Usage: npm run db:batch -- <${[...ALLOWED_BATCHES.keys()].join('|')}> [--country <slug>] [--dry-run]`);
+  process.exit(1);
+}
+if (countryOptionIndex >= 0 && !countrySlug) {
+  console.error('--country requires a country slug.');
   process.exit(1);
 }
 
@@ -29,12 +35,19 @@ const imported = await import(pathToFileURL(modulePath));
 const batch = imported[exportName];
 
 if (!Array.isArray(batch)) throw new Error(`Batch export not found: ${exportName}`);
+const selectedBatch = countrySlug
+  ? batch.filter((country) => country.slug === countrySlug)
+  : batch;
+if (countrySlug && selectedBatch.length === 0) {
+  throw new Error(`Country ${countrySlug} is not part of batch ${batchName}.`);
+}
 
 const summary = {
   batch: batchName,
-  countries: batch.length,
-  cities: batch.reduce((sum, country) => sum + country.cities.length, 0),
-  warnings: batch.reduce((sum, country) => sum + country.warnings.length, 0),
+  country: countrySlug,
+  countries: selectedBatch.length,
+  cities: selectedBatch.reduce((sum, country) => sum + country.cities.length, 0),
+  warnings: selectedBatch.reduce((sum, country) => sum + country.warnings.length, 0),
   dryRun,
   applied: { countries: 0, regions: 0, cities: 0, warnings: 0, sources: 0 },
 };
@@ -49,7 +62,7 @@ if (process.env.NODE_ENV === 'production' && process.env.ALLOW_PRODUCTION_SEED !
   throw new Error('Production batch apply requires ALLOW_PRODUCTION_SEED=true.');
 }
 
-for (const countryData of batch) {
+for (const countryData of selectedBatch) {
   const hasOfficialSource = countryData.warnings.some((warning) =>
     (warning.sources ?? []).some((source) =>
       source.url && ['OFFICIAL', 'GOVERNMENT_ADVISORY'].includes(source.kind ?? 'OFFICIAL'),
