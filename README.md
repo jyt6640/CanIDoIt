@@ -39,7 +39,8 @@ npm run build
 서버 환경변수에 `NVIDIA_API_KEY`를 설정하면 `/search`에서 NVIDIA NIM이 질문의 국가·도시·행동을 구조화하고, 검증된 Warning만 근거로 답변합니다. 키가 없거나 호출이 실패하면 동일 API가 로컬 검색으로 안전하게 폴백합니다.
 
 ```bash
-NVIDIA_PRIMARY_MODEL=qwen/qwen3.5-397b-a17b
+NVIDIA_SEARCH_MODEL=qwen/qwen3.5-397b-a17b
+NVIDIA_EXTRACTION_MODEL=nvidia/nemotron-3-super-120b-a12b
 NVIDIA_EMBEDDING_MODEL=nvidia/llama-nemotron-embed-1b-v2
 NVIDIA_RERANK_MODEL=nvidia/llama-nemotron-rerank-1b-v2
 ```
