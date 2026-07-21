@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import { AlertTriangle, CheckCircle2, Clock3, Database, ExternalLink, FileSearch, Globe2 } from 'lucide-react';
 import { prisma } from '@/shared/db/prisma';
+import { requireAdmin } from '@/shared/admin/auth';
 
 const STATUS_LABELS = {
   DRAFT: '초안',
@@ -11,6 +12,8 @@ const STATUS_LABELS = {
 } as const;
 
 export default async function AdminDashboardPage() {
+  await requireAdmin();
+
   const [
     countries,
     regions,

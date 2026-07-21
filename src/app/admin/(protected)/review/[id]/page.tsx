@@ -2,6 +2,7 @@ import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { ExternalLink, Plus, Save, Trash2 } from 'lucide-react';
 import { prisma } from '@/shared/db/prisma';
+import { requireAdmin } from '@/shared/admin/auth';
 import { RISK_LEVELS, SOURCE_KINDS, WARNING_STATUSES } from '@/shared/admin/validation';
 
 const toDateInput = (value: Date | null) => value ? value.toISOString().slice(0, 10) : '';
@@ -13,6 +14,8 @@ export default async function AdminWarningDetailPage({
   params: Promise<{ id: string }>;
   searchParams: Promise<{ saved?: string; error?: string; sourceAdded?: string; sourceSaved?: string; sourceDeleted?: string }>;
 }) {
+  await requireAdmin();
+
   const { id } = await params;
   const messages = await searchParams;
   const warning = await prisma.warning.findUnique({

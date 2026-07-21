@@ -1,11 +1,14 @@
 import { ExternalLink, Video } from 'lucide-react';
 import { prisma } from '@/shared/db/prisma';
+import { requireAdmin } from '@/shared/admin/auth';
 
 export default async function AdminVideosPage({
   searchParams,
 }: {
   searchParams: Promise<{ saved?: string; archived?: string }>;
 }) {
+  await requireAdmin();
+
   const messages = await searchParams;
   const videos = await prisma.videoSourceCandidate.findMany({
     where: { status: 'REVIEWING' },
