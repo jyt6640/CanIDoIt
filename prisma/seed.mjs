@@ -4,6 +4,7 @@ import { PrismaClient } from '@prisma/client';
 import { OFFICIAL_EXPANSION } from './seed-data/official-expansion.mjs';
 import { REGION_CATALOG } from './seed-data/regions.mjs';
 import { CITY_PRIORITIES, COUNTRY_PRIORITIES, PRIORITY_SOURCE, REGION_PRIORITIES } from './seed-data/travel-priorities.mjs';
+import { CULTURAL_ETIQUETTE } from './seed-data/cultural-etiquette.mjs';
 
 const prisma = new PrismaClient();
 
@@ -685,6 +686,7 @@ const DATA = [
     ],
   },
   ...OFFICIAL_EXPANSION,
+  ...CULTURAL_ETIQUETTE,
 ];
 
 async function main() {
