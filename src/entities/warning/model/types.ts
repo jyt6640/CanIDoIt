@@ -2,8 +2,12 @@ export interface WarningSource {
   title: string;
   url?: string | null;
   checkedAt?: string | null;
-  kind?: 'OFFICIAL' | 'GOVERNMENT_ADVISORY' | 'COMMUNITY' | 'WIKI' | 'EDITORIAL';
+  kind?: 'OFFICIAL' | 'GOVERNMENT_ADVISORY' | 'COMMUNITY' | 'WIKI' | 'EDITORIAL' | 'VIDEO_CREATOR';
   platform?: string | null;
+  creatorName?: string | null;
+  publishedAt?: string | null;
+  timestampSeconds?: number | null;
+  claimSummary?: string | null;
 }
 
 export interface Warning {

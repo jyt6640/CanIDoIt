@@ -2,7 +2,7 @@ interface SourceLike {
   title: string;
   url?: string | null;
   checkedAt?: string | null;
-  kind?: 'OFFICIAL' | 'GOVERNMENT_ADVISORY' | 'COMMUNITY' | 'WIKI' | 'EDITORIAL';
+  kind?: 'OFFICIAL' | 'GOVERNMENT_ADVISORY' | 'COMMUNITY' | 'WIKI' | 'EDITORIAL' | 'VIDEO_CREATOR';
 }
 
 const OFFICIAL_HOSTS = new Set([
@@ -64,6 +64,7 @@ export type SourceTrustLevel =
   | 'COMMUNITY'
   | 'WIKI'
   | 'EDITORIAL'
+  | 'VIDEO_CREATOR'
   | 'NEEDS_REVIEW'
   | 'INVALID';
 
@@ -115,6 +116,9 @@ export const evaluateSourceTrust = (
   }
   if (source.kind === 'EDITORIAL') {
     return { level: 'EDITORIAL', label: '편집·여행 매체', hostname, isSecure, isStale };
+  }
+  if (source.kind === 'VIDEO_CREATOR') {
+    return { level: 'VIDEO_CREATOR', label: '여행 크리에이터 영상', hostname, isSecure, isStale };
   }
 
   if (isSecure && isLikelyOfficialHostname(hostname)) {

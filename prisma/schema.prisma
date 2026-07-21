@@ -58,6 +58,7 @@ enum SourceKind {
   COMMUNITY
   WIKI
   EDITORIAL
+  VIDEO_CREATOR
 }
 
 model Country {
@@ -213,8 +214,31 @@ model Source {
   checkedAt DateTime? // 최종 확인일
   kind      SourceKind @default(OFFICIAL)
   platform  String?
+  creatorName String?
+  publishedAt DateTime?
+  timestampSeconds Int?
+  claimSummary String?
   warning   Warning   @relation(fields: [warningId], references: [id], onDelete: Cascade)
   warningId String
+}
+
+model VideoSourceCandidate {
+  id               String        @id @default(cuid())
+  countrySlug      String?
+  regionSlug       String?
+  citySlug         String?
+  channelName      String
+  title            String
+  url              String        @unique
+  publishedAt      DateTime?
+  timestampSeconds Int?
+  claimSummary     String
+  status           WarningStatus @default(REVIEWING)
+  discoveredAt     DateTime      @default(now())
+  reviewedAt       DateTime?
+
+  @@index([status, countrySlug])
+  @@index([channelName])
 }
 
 model SyncProfile {

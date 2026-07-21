@@ -185,15 +185,25 @@ export const WarningDetailModal = ({
                     <li key={i} className="font-noto text-[13px] text-gray-600 leading-[1.5]">
                       {s.url ? (
                         <a
-                          href={s.url}
+                          href={s.timestampSeconds ? `${s.url}${s.url.includes('?') ? '&' : '?'}t=${s.timestampSeconds}` : s.url}
                           target="_blank"
                           rel="noopener noreferrer"
                           className="inline-flex items-center gap-1 text-gray-800 underline decoration-gray-300 hover:decoration-gray-800"
                         >
-                          {s.title} <ExternalLink size={12} className="shrink-0" />
+                          {s.kind === 'VIDEO_CREATOR' && s.creatorName
+                            ? `${s.creatorName} · ${s.title}`
+                            : s.title}
+                          <ExternalLink size={12} className="shrink-0" />
                         </a>
                       ) : (
                         <span>{s.title}</span>
+                      )}
+                      {s.kind === 'VIDEO_CREATOR' && (
+                        <p className="mt-1 text-[11px] text-gray-500">
+                          여행 크리에이터 영상
+                          {s.timestampSeconds != null ? ` · ${Math.floor(s.timestampSeconds / 60)}:${String(s.timestampSeconds % 60).padStart(2, '0')}` : ''}
+                          {s.claimSummary ? ` · ${s.claimSummary}` : ''}
+                        </p>
                       )}
                     </li>
                   ))}

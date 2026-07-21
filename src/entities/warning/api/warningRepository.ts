@@ -38,8 +38,12 @@ type PrismaWarning = {
     title: string;
     url: string | null;
     checkedAt: Date | null;
-    kind: 'OFFICIAL' | 'GOVERNMENT_ADVISORY' | 'COMMUNITY' | 'WIKI' | 'EDITORIAL';
+    kind: 'OFFICIAL' | 'GOVERNMENT_ADVISORY' | 'COMMUNITY' | 'WIKI' | 'EDITORIAL' | 'VIDEO_CREATOR';
     platform: string | null;
+    creatorName: string | null;
+    publishedAt: Date | null;
+    timestampSeconds: number | null;
+    claimSummary: string | null;
   }[];
   status: 'DRAFT' | 'REVIEWING' | 'VERIFIED' | 'STALE' | 'ARCHIVED';
   verifiedAt: Date | null;
@@ -83,6 +87,10 @@ function toWarning(w: PrismaWarning): Warning {
       checkedAt: s.checkedAt ? s.checkedAt.toISOString() : null,
       kind: s.kind,
       platform: s.platform,
+      creatorName: s.creatorName,
+      publishedAt: s.publishedAt?.toISOString() ?? null,
+      timestampSeconds: s.timestampSeconds,
+      claimSummary: s.claimSummary,
     })),
     status: w.expiresAt && w.expiresAt < new Date() && w.status === 'VERIFIED' ? 'STALE' : w.status,
     verifiedAt: w.verifiedAt?.toISOString() ?? null,
