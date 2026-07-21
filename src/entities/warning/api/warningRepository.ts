@@ -151,6 +151,44 @@ export const getDestinationWarnings = cache(async (
   };
 });
 
+export const getRegionWarnings = cache(async (
+  countrySlug: string,
+  regionSlug: string,
+): Promise<DestinationWarnings | null> => {
+  const country = await prisma.country.findUnique({
+    where: { slug: countrySlug },
+    include: {
+      regions: { include: { cities: true } },
+    },
+  });
+  if (!country) return null;
+
+  const region = country.regions.find((item) => item.slug === regionSlug);
+  if (!region) return null;
+
+  const warnings = await prisma.warning.findMany({
+    where: {
+      countryId: country.id,
+      archived: false,
+      status: { in: ['VERIFIED', 'STALE', 'REVIEWING'] },
+      OR: [
+        { cityId: null, regionId: null },
+        { cityId: null, regionId: region.id },
+        { cityId: { in: region.cities.map((city) => city.id) } },
+      ],
+    },
+    orderBy: { order: 'asc' },
+    include: { sources: true },
+  });
+
+  return {
+    country: { name: country.name, slug: country.slug },
+    region: { name: region.name, slug: region.slug, type: region.type },
+    city: null,
+    warnings: warnings.map(toWarning),
+  };
+});
+
 export const getAllPublicWarnings = cache(async (): Promise<SavedWarningRecord[]> => {
   const warnings = await prisma.warning.findMany({
     where: {

@@ -17,17 +17,21 @@ import { track } from '@/shared/lib/analytics';
 interface DestinationViewProps {
   countrySlug: string;
   citySlug: string | null;
+  regionSlug?: string | null;
   warnings: Warning[];
   countryName: string;
   cityName: string | null;
+  regionName?: string | null;
 }
 
 export const DestinationView = ({
   countrySlug,
   citySlug,
+  regionSlug = null,
   warnings,
   countryName,
   cityName,
+  regionName = null,
 }: DestinationViewProps) => {
   const { savedItems, toggleSave } = useSavedItems();
   const [selectedWarning, setSelectedWarning] = useState<Warning | null>(null);
@@ -43,7 +47,7 @@ export const DestinationView = ({
       city: citySlug ?? undefined,
       count: warnings.length,
     });
-  }, [countrySlug, citySlug, warnings.length]);
+  }, [countrySlug, citySlug, regionSlug, warnings.length]);
 
   useEffect(() => {
     const key = new URLSearchParams(window.location.search).get('warning');
@@ -94,7 +98,11 @@ export const DestinationView = ({
     window.history.replaceState(null, '', url);
   }, []);
 
-  const displayLocation = cityName ? `${countryName} · ${cityName}` : countryName;
+  const displayLocation = cityName
+    ? `${countryName} · ${regionName ? `${regionName} · ` : ''}${cityName}`
+    : regionName
+      ? `${countryName} · ${regionName}`
+      : countryName;
 
   return (
     <div className="relative min-h-screen bg-light-bg font-noto text-black selection:bg-[#5ae14c]/30">
@@ -121,7 +129,7 @@ export const DestinationView = ({
       <ResultsSection
         warnings={warnings}
         countryName={countryName}
-        cityName={cityName}
+        cityName={cityName ?? regionName}
         savedItems={savedItems}
         onToggleSave={handleToggleSave}
         onOpenWarning={handleOpenWarning}
