@@ -140,6 +140,8 @@ model SourceSnapshot {
   sourceId      String
   contentHash   String
   extractedText String
+  provider      String   @default("direct-fetch")
+  metadata      Json?
   changed       Boolean  @default(false)
   fetchedAt     DateTime @default(now())
   drafts        ContentDraft[]
