@@ -4,7 +4,7 @@ const prisma = new PrismaClient();
 const snapshotId = process.argv[2];
 const apiKey = process.env.NVIDIA_API_KEY;
 const baseUrl = process.env.NVIDIA_BASE_URL ?? 'https://integrate.api.nvidia.com/v1';
-const model = process.env.NVIDIA_PRIMARY_MODEL ?? 'qwen/qwen3.5-397b-a17b';
+const model = process.env.NVIDIA_EXTRACTION_MODEL ?? 'nvidia/nemotron-3-super-120b-a12b';
 
 if (!snapshotId) {
   console.error('Usage: npm run content:draft -- <snapshot-id>');

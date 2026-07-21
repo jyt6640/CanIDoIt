@@ -69,7 +69,7 @@ export async function POST(request: Request) {
 
   return NextResponse.json({
     provider: isNvidiaNimConfigured() ? 'nvidia-nim' : 'local-fallback',
-    model: isNvidiaNimConfigured() ? nvidiaModels.primary : null,
+    model: isNvidiaNimConfigured() ? nvidiaModels.search : null,
     parsed,
     answer: { ...answer, warningKeys: safeKeys.length ? safeKeys : fallbackAnswer.warningKeys },
     results: hits.map(({ warning, country, city, score }) => ({
