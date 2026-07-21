@@ -2,8 +2,8 @@
 
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
-import { FormEvent, useEffect, useState } from 'react';
-import { ExternalLink, Loader2, Search, Sparkles } from 'lucide-react';
+import { FormEvent, useEffect, useRef, useState } from 'react';
+import { ExternalLink, Loader2, Search, Sparkles, X } from 'lucide-react';
 
 type SearchResult = {
   warningKey: string;
@@ -43,10 +43,18 @@ export const BehaviorSearchView = () => {
   const [data, setData] = useState<SearchResponse | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const requestControllerRef = useRef<AbortController | null>(null);
+  const requestIdRef = useRef(0);
 
   const search = async (question: string) => {
     const trimmed = question.trim();
     if (trimmed.length < 2) return;
+
+    requestControllerRef.current?.abort();
+    const controller = new AbortController();
+    requestControllerRef.current = controller;
+    const requestId = ++requestIdRef.current;
+
     setLoading(true);
     setError('');
     try {
@@ -54,24 +62,40 @@ export const BehaviorSearchView = () => {
         method: 'POST',
         headers: { 'content-type': 'application/json' },
         body: JSON.stringify({ question: trimmed }),
+        signal: controller.signal,
       });
       const payload = await response.json() as SearchResponse & { error?: string };
       if (!response.ok) throw new Error(payload.error ?? '검색에 실패했어요.');
+      if (requestId !== requestIdRef.current) return;
       setData(payload);
       const url = new URL(window.location.href);
       url.searchParams.set('q', trimmed);
       window.history.replaceState(null, '', url);
     } catch (searchError) {
+      if (controller.signal.aborted) return;
       setError(searchError instanceof Error ? searchError.message : '검색에 실패했어요.');
     } finally {
-      setLoading(false);
+      if (requestId === requestIdRef.current) {
+        setLoading(false);
+        requestControllerRef.current = null;
+      }
     }
+  };
+
+  const cancelSearch = () => {
+    requestControllerRef.current?.abort();
+    requestControllerRef.current = null;
+    requestIdRef.current += 1;
+    setLoading(false);
   };
 
   useEffect(() => {
     if (!initialQuery) return;
     const timer = window.setTimeout(() => void search(initialQuery), 0);
-    return () => window.clearTimeout(timer);
+    return () => {
+      window.clearTimeout(timer);
+      requestControllerRef.current?.abort();
+    };
   // 최초 URL 질문만 자동 검색한다.
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -100,14 +124,35 @@ export const BehaviorSearchView = () => {
         <form onSubmit={onSubmit} className="mt-8 flex gap-2 rounded-2xl bg-white p-3 shadow-sm">
           <input
             value={query}
-            onChange={(event) => setQuery(event.target.value)}
+            onChange={(event) => {
+              if (loading) cancelSearch();
+              setQuery(event.target.value);
+            }}
             placeholder="태국에 전자담배 가져가도 돼?"
             className="min-w-0 flex-1 px-3 py-3 text-base outline-none"
           />
-          <button type="submit" disabled={loading} className="rounded-xl bg-black px-4 text-white disabled:opacity-50" aria-label="검색">
-            {loading ? <Loader2 className="animate-spin" size={18} /> : <Search size={18} />}
-          </button>
+          {loading ? (
+            <button
+              type="button"
+              onClick={cancelSearch}
+              className="rounded-xl bg-gray-700 px-4 text-white"
+              aria-label="검색 취소"
+              title="검색 취소"
+            >
+              <X size={18} />
+            </button>
+          ) : (
+            <button type="submit" className="rounded-xl bg-black px-4 text-white" aria-label="검색">
+              <Search size={18} />
+            </button>
+          )}
         </form>
+
+        {loading && (
+          <p className="mt-3 flex items-center gap-2 text-sm text-gray-500">
+            <Loader2 className="animate-spin" size={14} /> 검색 중에도 입력을 바꾸면 기존 요청이 자동 취소돼요.
+          </p>
+        )}
 
         {error && <p className="mt-4 rounded-xl bg-red-50 p-4 text-sm text-red-700">{error}</p>}
 
