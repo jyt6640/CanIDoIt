@@ -1,5 +1,4 @@
 import type { Metadata } from 'next';
-import { getAllPublicWarnings } from '@/entities/warning/api/warningRepository';
 import { BehaviorSearchView } from '@/views/search';
 
 export const metadata: Metadata = {
@@ -10,6 +9,5 @@ export const metadata: Metadata = {
 export const dynamic = 'force-dynamic';
 
 export default async function SearchPage() {
-  const records = await getAllPublicWarnings();
-  return <BehaviorSearchView records={records} />;
+  return <BehaviorSearchView />;
 }

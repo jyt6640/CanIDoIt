@@ -65,6 +65,7 @@ model Warning {
   locations     String[] @default([])
   keywords      String[] @default([])
   aliases       String[] @default([])
+  legacyKeys    String[] @default([])
   order         Int      @default(0) // 노출 정렬 순서
 
   country   Country @relation(fields: [countryId], references: [id], onDelete: Cascade)
@@ -81,6 +82,53 @@ model Warning {
   @@index([cityId])
   @@index([archived])
   @@index([status])
+}
+
+model OfficialSource {
+  id            String   @id @default(cuid())
+  countryCode   String
+  agencyName    String
+  url           String   @unique
+  sourceType    String
+  language      String   @default("en")
+  enabled       Boolean  @default(true)
+  lastFetchedAt DateTime?
+  snapshots     SourceSnapshot[]
+  drafts        ContentDraft[]
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  @@index([countryCode, enabled])
+}
+
+model SourceSnapshot {
+  id            String   @id @default(cuid())
+  source        OfficialSource @relation(fields: [sourceId], references: [id], onDelete: Cascade)
+  sourceId      String
+  contentHash   String
+  extractedText String
+  changed       Boolean  @default(false)
+  fetchedAt     DateTime @default(now())
+  drafts        ContentDraft[]
+
+  @@unique([sourceId, contentHash])
+  @@index([sourceId, fetchedAt])
+}
+
+model ContentDraft {
+  id          String   @id @default(cuid())
+  source      OfficialSource @relation(fields: [sourceId], references: [id], onDelete: Cascade)
+  sourceId    String
+  snapshot    SourceSnapshot @relation(fields: [snapshotId], references: [id], onDelete: Cascade)
+  snapshotId  String
+  model       String
+  payload     Json
+  evidence    String
+  status      WarningStatus @default(REVIEWING)
+  createdAt   DateTime @default(now())
+  reviewedAt  DateTime?
+
+  @@index([status, createdAt])
 }
 
 // 출처 — "출처 기반" 신뢰 문구의 실체 (#3)

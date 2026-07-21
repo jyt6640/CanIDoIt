@@ -1,1 +1,1 @@
-export { useSavedItems } from './model/useSavedItems';
+export { replaceSavedItems, useSavedItems } from './model/useSavedItems';

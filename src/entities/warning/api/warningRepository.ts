@@ -31,6 +31,7 @@ type PrismaWarning = {
   locations: string[];
   keywords: string[];
   aliases: string[];
+  legacyKeys: string[];
   sources: { title: string; url: string | null; checkedAt: Date | null }[];
   status: 'DRAFT' | 'REVIEWING' | 'VERIFIED' | 'STALE' | 'ARCHIVED';
   verifiedAt: Date | null;
@@ -62,6 +63,7 @@ function toWarning(w: PrismaWarning): Warning {
     locations: w.locations,
     keywords: w.keywords,
     aliases: w.aliases,
+    legacyKeys: w.legacyKeys,
     sources: w.sources.map((s) => ({
       title: s.title,
       url: s.url,
