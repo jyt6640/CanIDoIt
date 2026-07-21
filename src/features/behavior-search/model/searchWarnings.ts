@@ -2,6 +2,7 @@ import type { SavedWarningRecord } from '@/entities/warning/api/warningRepositor
 
 export interface ParsedTravelQuestion {
   country?: string | null;
+  region?: string | null;
   city?: string | null;
   actions: string[];
   categories: string[];
@@ -20,6 +21,7 @@ export function fallbackParseQuestion(question: string): ParsedTravelQuestion {
   const actions = normalized.split(' ').filter((term) => term.length > 1);
   return {
     country: null,
+    region: null,
     city: null,
     actions,
     categories: [],
@@ -41,9 +43,9 @@ export function rankWarnings(
 
   return records
     .map((record) => {
-      const { warning, country, city } = record;
+      const { warning, country, region, city } = record;
       const title = normalizeSearchText(warning.title);
-      const destination = normalizeSearchText(`${country.name} ${city?.name ?? ''}`);
+      const destination = normalizeSearchText(`${country.name} ${region?.name ?? ''} ${city?.name ?? ''}`);
       const body = normalizeSearchText([
         warning.reason,
         warning.alternative,
@@ -61,6 +63,7 @@ export function rankWarnings(
         if (body.includes(term)) score += 2;
       }
       if (parsed.country && destination.includes(normalizeSearchText(parsed.country))) score += 8;
+      if (parsed.region && destination.includes(normalizeSearchText(parsed.region))) score += 8;
       if (parsed.city && destination.includes(normalizeSearchText(parsed.city))) score += 8;
       if (warning.status === 'VERIFIED') score += 2;
       if (warning.sources?.some((source) => source.url)) score += 2;

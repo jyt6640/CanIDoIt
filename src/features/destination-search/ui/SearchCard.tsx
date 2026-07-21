@@ -20,15 +20,23 @@ export const SearchCard = ({ countries }: SearchCardProps) => {
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
   const [countrySlug, setCountrySlug] = useState('');
+  const [regionSlug, setRegionSlug] = useState('');
   const [citySlug, setCitySlug] = useState('');
   const [question, setQuestion] = useState('');
 
   const selectedCountry = countries.find((c) => c.slug === countrySlug);
+  const visibleCities = regionSlug
+    ? selectedCountry?.cities.filter((city) => city.region?.slug === regionSlug) ?? []
+    : selectedCountry?.cities ?? [];
 
-  const go = (country: string, city?: string) => {
+  const go = (country: string, city?: string, region?: string) => {
     if (!country) return;
     track('search', { country, city });
-    const href = city ? `/${country}/${city}` : `/${country}`;
+    const href = city
+      ? `/${country}/${city}`
+      : region
+        ? `/${country}/regions/${region}`
+        : `/${country}`;
     startTransition(() => router.push(href));
   };
 
@@ -83,6 +91,7 @@ export const SearchCard = ({ countries }: SearchCardProps) => {
               value={countrySlug}
               onChange={(e) => {
                 setCountrySlug(e.target.value);
+                setRegionSlug('');
                 setCitySlug('');
               }}
             >
@@ -102,6 +111,30 @@ export const SearchCard = ({ countries }: SearchCardProps) => {
         {/* Divider (Desktop) */}
         <div className="hidden md:block w-[1px] h-10 bg-gray-200 mt-5"></div>
 
+        {/* Region Field */}
+        <div className="w-full md:flex-1 relative">
+          <label className="block text-[11px] font-noto text-gray-500 font-semibold mb-1 ml-1">지역</label>
+          <div className="relative">
+            <select
+              className="w-full appearance-none bg-gray-50 border border-gray-200 rounded-lg py-3 px-4 text-black font-noto font-medium focus:outline-none focus:ring-2 focus:ring-black/20 focus:border-black/30 transition-all text-[15px] disabled:opacity-50 disabled:bg-gray-100"
+              value={regionSlug}
+              onChange={(e) => {
+                setRegionSlug(e.target.value);
+                setCitySlug('');
+              }}
+              disabled={!selectedCountry || selectedCountry.regions.length === 0}
+            >
+              <option value="">지역은 선택사항입니다</option>
+              {selectedCountry?.regions.map((region) => (
+                <option key={region.slug} value={region.slug}>{region.name}</option>
+              ))}
+            </select>
+            <ChevronDown size={18} className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" />
+          </div>
+        </div>
+
+        <div className="hidden md:block w-[1px] h-10 bg-gray-200 mt-5"></div>
+
         {/* City Field */}
         <div className="w-full md:flex-1 relative">
           <label className="block text-[11px] font-noto text-gray-500 font-semibold mb-1 ml-1">도시</label>
@@ -113,7 +146,7 @@ export const SearchCard = ({ countries }: SearchCardProps) => {
               disabled={!selectedCountry}
             >
               <option value="">도시는 선택사항입니다</option>
-              {selectedCountry?.cities.map((city) => (
+              {visibleCities.map((city) => (
                 <option key={city.slug} value={city.slug}>
                   {city.name}
                 </option>
@@ -125,7 +158,7 @@ export const SearchCard = ({ countries }: SearchCardProps) => {
 
         {/* Submit Button */}
         <button
-          onClick={() => go(countrySlug, citySlug || undefined)}
+          onClick={() => go(countrySlug, citySlug || undefined, regionSlug || undefined)}
           disabled={isSubmitDisabled || isPending}
           aria-label="주의사항 확인하기"
           className={`w-full md:w-[44px] h-[44px] rounded-full flex items-center justify-center transition-all mt-4 md:mt-5 ${
