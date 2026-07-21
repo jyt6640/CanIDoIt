@@ -1,5 +1,6 @@
 import crypto from 'node:crypto';
 import { PrismaClient } from '@prisma/client';
+import { collectWithProvider } from './lib/crawler-providers.mjs';
 
 const prisma = new PrismaClient();
 const sourceUrl = process.argv[2];
@@ -15,22 +16,8 @@ if (!source || !source.enabled) {
   process.exit(1);
 }
 
-const response = await fetch(source.url, {
-  headers: { 'user-agent': 'CanIDoItBot/1.0 (+official travel guidance monitor)' },
-  signal: AbortSignal.timeout(20_000),
-});
-if (!response.ok) throw new Error(`Fetch failed: ${response.status}`);
-
-const html = await response.text();
-const extractedText = html
-  .replace(/<script[\s\S]*?<\/script>/gi, ' ')
-  .replace(/<style[\s\S]*?<\/style>/gi, ' ')
-  .replace(/<[^>]+>/g, ' ')
-  .replace(/&nbsp;/g, ' ')
-  .replace(/&amp;/g, '&')
-  .replace(/\s+/g, ' ')
-  .trim()
-  .slice(0, 250_000);
+const collected = await collectWithProvider(source.url);
+const extractedText = collected.text.slice(0, 250_000);
 const contentHash = crypto.createHash('sha256').update(extractedText).digest('hex');
 const previous = await prisma.sourceSnapshot.findFirst({
   where: { sourceId: source.id },
@@ -45,9 +32,11 @@ const snapshot = await prisma.sourceSnapshot.upsert({
     contentHash,
     extractedText,
     changed: Boolean(previous && previous.contentHash !== contentHash),
+    provider: collected.provider,
+    metadata: collected.metadata,
   },
 });
 await prisma.officialSource.update({ where: { id: source.id }, data: { lastFetchedAt: new Date() } });
 
-console.log(JSON.stringify({ source: source.url, snapshotId: snapshot.id, changed: snapshot.changed }));
+console.log(JSON.stringify({ source: source.url, provider: snapshot.provider, snapshotId: snapshot.id, changed: snapshot.changed }));
 await prisma.$disconnect();

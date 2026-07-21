@@ -65,6 +65,8 @@ npm run content:audit:apply
 
 서비스 화면의 `/transparency`에서도 이 파이프라인과 공개 기준을 확인할 수 있습니다.
 
+외부 크롤링 엔진 비교와 운영 원칙은 [`docs/crawling-architecture.md`](docs/crawling-architecture.md)에 정리되어 있습니다. 기본값은 `direct-fetch`이며, 동적 공식 페이지는 `CRAWLER_PROVIDER=firecrawl`로 선택할 수 있습니다. 크롤링은 Vercel 요청 안에서 실행하지 않고 CLI·스케줄 워커·외부 플랫폼에서 실행합니다.
+
 기존 Seed 전환 과정에서 생긴 동일 국가·도시·제목 중복은 다음 명령으로 안정 키 레코드에 병합합니다.
 
 ```bash
