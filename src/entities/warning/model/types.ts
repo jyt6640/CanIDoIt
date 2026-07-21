@@ -18,6 +18,7 @@ export interface Warning {
   locations: string[];
   keywords?: string[];
   aliases?: string[];
+  legacyKeys?: string[];
   sources?: WarningSource[];
   status?: 'DRAFT' | 'REVIEWING' | 'VERIFIED' | 'STALE' | 'ARCHIVED';
   verifiedAt?: string | null;

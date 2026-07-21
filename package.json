@@ -17,7 +17,10 @@
     "db:seed": "prisma db seed",
     "db:reset": "prisma migrate reset --force",
     "db:setup": "prisma migrate deploy && prisma db seed",
-    "deploy:migrate": "prisma migrate deploy"
+    "deploy:migrate": "prisma migrate deploy",
+    "db:dedupe": "node scripts/dedupe-warnings.mjs",
+    "content:collect": "node scripts/collect-official-source.mjs",
+    "content:draft": "node scripts/draft-content-from-snapshot.mjs"
   },
   "prisma": {
     "seed": "node prisma/seed.mjs"

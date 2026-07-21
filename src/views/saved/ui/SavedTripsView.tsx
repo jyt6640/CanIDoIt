@@ -2,10 +2,11 @@
 
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
+import { useEffect } from 'react';
 import { Bookmark, Share2, Trash2 } from 'lucide-react';
 import type { SavedWarningRecord } from '@/entities/warning/api/warningRepository';
 import { WarningCard } from '@/entities/warning';
-import { useSavedItems } from '@/features/warning-save';
+import { replaceSavedItems, useSavedItems } from '@/features/warning-save';
 import { copyToClipboard } from '@/shared/lib/clipboard';
 
 interface SavedTripsViewProps {
@@ -18,7 +19,24 @@ export const SavedTripsView = ({ records }: SavedTripsViewProps) => {
   const sharedIds = new Set((searchParams.get('items') ?? '').split(',').filter(Boolean));
   const isSharedView = sharedIds.size > 0;
   const visibleIds = isSharedView ? sharedIds : savedItems;
-  const saved = records.filter(({ warning }) => visibleIds.has(warning.id));
+  const saved = records.filter(({ warning }) =>
+    visibleIds.has(warning.id) || (warning.legacyKeys ?? []).some((key) => visibleIds.has(key)),
+  );
+
+  useEffect(() => {
+    if (isSharedView) return;
+    const migrated = new Set(savedItems);
+    let changed = false;
+    for (const { warning } of records) {
+      for (const legacyKey of warning.legacyKeys ?? []) {
+        if (migrated.delete(legacyKey)) {
+          migrated.add(warning.id);
+          changed = true;
+        }
+      }
+    }
+    if (changed) replaceSavedItems([...migrated]);
+  }, [isSharedView, records, savedItems]);
   const grouped = Map.groupBy(saved, ({ country, city }) => `${country.name}|${city?.name ?? '국가 공통'}`);
 
   return (

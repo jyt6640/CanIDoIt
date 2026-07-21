@@ -34,6 +34,31 @@ npm run build
 
 운영 상태 확인 경로는 `/api/health`입니다. 데이터베이스 연결까지 성공하면 HTTP 200과 `status: "ok"`를 반환합니다.
 
+## NVIDIA NIM 검색과 콘텐츠 수집
+
+서버 환경변수에 `NVIDIA_API_KEY`를 설정하면 `/search`에서 NVIDIA NIM이 질문의 국가·도시·행동을 구조화하고, 검증된 Warning만 근거로 답변합니다. 키가 없거나 호출이 실패하면 동일 API가 로컬 검색으로 안전하게 폴백합니다.
+
+```bash
+NVIDIA_PRIMARY_MODEL=qwen/qwen3.5-397b-a17b
+NVIDIA_EMBEDDING_MODEL=nvidia/llama-nemotron-embed-1b-v2
+NVIDIA_RERANK_MODEL=nvidia/llama-nemotron-rerank-1b-v2
+```
+
+공식 출처 파이프라인은 등록된 `OfficialSource`만 수집합니다.
+
+```bash
+npm run content:collect -- https://official.example/page
+npm run content:draft -- <snapshot-id>
+```
+
+원문 해시가 달라진 문서만 변경으로 표시되고, AI가 생성한 후보는 원문에 실제 존재하는 근거 문장이 검증된 경우에만 `REVIEWING` 초안으로 저장됩니다. 공개는 관리자 검수 후 별도로 진행해야 합니다.
+
+기존 Seed 전환 과정에서 생긴 동일 국가·도시·제목 중복은 다음 명령으로 안정 키 레코드에 병합합니다.
+
+```bash
+npm run db:dedupe
+```
+
 ## 아키텍처 — Feature-Sliced Design (FSD)
 
 Next.js App Router의 `pages` 개념과 충돌을 피하기 위해 FSD의 `pages` 레이어는 `views`로 대체했습니다.
