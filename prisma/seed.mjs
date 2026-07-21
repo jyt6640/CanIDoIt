@@ -7,6 +7,7 @@ import { REGION_CATALOG } from './seed-data/regions.mjs';
 import { CITY_PRIORITIES, COUNTRY_PRIORITIES, PRIORITY_SOURCE, REGION_PRIORITIES } from './seed-data/travel-priorities.mjs';
 import { CULTURAL_ETIQUETTE } from './seed-data/cultural-etiquette.mjs';
 import { COMMUNITY_CULTURAL_SIGNALS } from './seed-data/community-cultural-signals.mjs';
+import { CULTURAL_SIGNALS_BULK_V2 } from './seed-data/cultural-signals-bulk-v2.mjs';
 
 const prisma = new PrismaClient();
 
@@ -691,6 +692,7 @@ const DATA = [
   ...OFFICIAL_EXPANSION_V2,
   ...CULTURAL_ETIQUETTE,
   ...COMMUNITY_CULTURAL_SIGNALS,
+  ...CULTURAL_SIGNALS_BULK_V2,
 ];
 
 async function main() {
