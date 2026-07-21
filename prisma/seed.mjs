@@ -3,6 +3,7 @@
 import { PrismaClient } from '@prisma/client';
 import { OFFICIAL_EXPANSION } from './seed-data/official-expansion.mjs';
 import { REGION_CATALOG } from './seed-data/regions.mjs';
+import { CITY_PRIORITIES, COUNTRY_PRIORITIES, PRIORITY_SOURCE, REGION_PRIORITIES } from './seed-data/travel-priorities.mjs';
 
 const prisma = new PrismaClient();
 
@@ -694,8 +695,21 @@ async function main() {
   for (const c of DATA) {
     const country = await prisma.country.upsert({
       where: { slug: c.slug },
-      update: { name: c.name },
-      create: { name: c.name, slug: c.slug },
+      update: {
+        name: c.name,
+        priorityScore: COUNTRY_PRIORITIES[c.slug] ?? 0,
+        contentStatus: c.warnings.some((warning) => (warning.sources ?? []).some((source) => source.url)) ? 'AVAILABLE' : 'IN_REVIEW',
+        prioritySource: PRIORITY_SOURCE.url,
+        priorityCheckedAt: new Date(PRIORITY_SOURCE.checkedAt),
+      },
+      create: {
+        name: c.name,
+        slug: c.slug,
+        priorityScore: COUNTRY_PRIORITIES[c.slug] ?? 0,
+        contentStatus: c.warnings.some((warning) => (warning.sources ?? []).some((source) => source.url)) ? 'AVAILABLE' : 'IN_REVIEW',
+        prioritySource: PRIORITY_SOURCE.url,
+        priorityCheckedAt: new Date(PRIORITY_SOURCE.checkedAt),
+      },
     });
 
     const cities = [];
@@ -703,8 +717,17 @@ async function main() {
     for (const regionData of REGION_CATALOG[c.slug] ?? []) {
       regions.push(await prisma.region.upsert({
         where: { countryId_slug: { countryId: country.id, slug: regionData.slug } },
-        update: { name: regionData.name, type: regionData.type },
-        create: { name: regionData.name, slug: regionData.slug, type: regionData.type, countryId: country.id },
+        update: {
+          name: regionData.name,
+          type: regionData.type,
+          priorityScore: REGION_PRIORITIES[`${c.slug}:${regionData.slug}`] ?? 0,
+          contentStatus: 'PARTIAL',
+        },
+        create: {
+          name: regionData.name, slug: regionData.slug, type: regionData.type, countryId: country.id,
+          priorityScore: REGION_PRIORITIES[`${c.slug}:${regionData.slug}`] ?? 0,
+          contentStatus: 'PARTIAL',
+        },
       }));
     }
     const regionSlugToId = Object.fromEntries(regions.map((region) => [region.slug, region.id]));
@@ -715,8 +738,16 @@ async function main() {
       const regionId = cityToRegionSlug[cityData.slug] ? regionSlugToId[cityToRegionSlug[cityData.slug]] : null;
       cities.push(await prisma.city.upsert({
         where: { countryId_slug: { countryId: country.id, slug: cityData.slug } },
-        update: { name: cityData.name, regionId },
-        create: { name: cityData.name, slug: cityData.slug, countryId: country.id, regionId },
+        update: {
+          name: cityData.name, regionId,
+          priorityScore: CITY_PRIORITIES[`${c.slug}:${cityData.slug}`] ?? 0,
+          contentStatus: 'PARTIAL',
+        },
+        create: {
+          name: cityData.name, slug: cityData.slug, countryId: country.id, regionId,
+          priorityScore: CITY_PRIORITIES[`${c.slug}:${cityData.slug}`] ?? 0,
+          contentStatus: 'PARTIAL',
+        },
       }));
     }
     const citySlugToId = Object.fromEntries(cities.map((city) => [city.slug, city.id]));

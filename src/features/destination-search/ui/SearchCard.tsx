@@ -100,7 +100,7 @@ export const SearchCard = ({ countries }: SearchCardProps) => {
               </option>
               {countries.map((c) => (
                 <option key={c.slug} value={c.slug}>
-                  {c.name}
+                  {c.priorityScore >= 90 ? '인기 · ' : ''}{c.name}
                 </option>
               ))}
             </select>
@@ -126,7 +126,9 @@ export const SearchCard = ({ countries }: SearchCardProps) => {
             >
               <option value="">지역은 선택사항입니다</option>
               {selectedCountry?.regions.map((region) => (
-                <option key={region.slug} value={region.slug}>{region.name}</option>
+                <option key={region.slug} value={region.slug}>
+                  {region.priorityScore >= 90 ? '인기 · ' : ''}{region.name}
+                </option>
               ))}
             </select>
             <ChevronDown size={18} className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" />
@@ -148,7 +150,7 @@ export const SearchCard = ({ countries }: SearchCardProps) => {
               <option value="">도시는 선택사항입니다</option>
               {visibleCities.map((city) => (
                 <option key={city.slug} value={city.slug}>
-                  {city.name}
+                  {city.priorityScore >= 90 ? '인기 · ' : ''}{city.name}
                 </option>
               ))}
             </select>
@@ -201,7 +203,7 @@ export const SearchCard = ({ countries }: SearchCardProps) => {
           ))}
         </div>
         <p className="text-white/80 font-noto text-[11px] md:text-[12px]">
-          도시를 입력하지 않으면 국가 공통 정보를 보여드려요.
+          인기 순서는 한국인 여행 수요와 검증 데이터 보유량을 함께 반영한 편집 우선순위예요.
         </p>
       </div>
     </div>

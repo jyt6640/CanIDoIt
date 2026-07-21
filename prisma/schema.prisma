@@ -38,6 +38,14 @@ enum RegionType {
   OTHER
 }
 
+enum ContentAvailability {
+  AVAILABLE
+  PARTIAL
+  IN_REVIEW
+  REQUESTED
+  NO_VERIFIED_DATA
+}
+
 model Country {
   id       String    @id @default(cuid())
   name     String    @unique // 표시명 (예: 일본)
@@ -45,6 +53,12 @@ model Country {
   cities   City[]
   regions  Region[]
   warnings Warning[]
+  priorityScore     Int                 @default(0)
+  contentStatus    ContentAvailability @default(IN_REVIEW)
+  prioritySource   String?
+  priorityCheckedAt DateTime?
+
+  @@index([priorityScore])
 }
 
 model Region {
@@ -56,9 +70,12 @@ model Region {
   countryId String
   cities    City[]
   warnings  Warning[]
+  priorityScore  Int                 @default(0)
+  contentStatus ContentAvailability @default(IN_REVIEW)
 
   @@unique([countryId, slug])
   @@index([countryId, type])
+  @@index([priorityScore])
 }
 
 model City {
@@ -70,8 +87,11 @@ model City {
   region    Region?   @relation(fields: [regionId], references: [id], onDelete: SetNull)
   regionId  String?
   warnings  Warning[]
+  priorityScore  Int                 @default(0)
+  contentStatus ContentAvailability @default(IN_REVIEW)
 
   @@unique([countryId, slug])
+  @@index([priorityScore])
 }
 
 model Warning {
