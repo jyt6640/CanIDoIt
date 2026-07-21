@@ -102,3 +102,15 @@
 
 여행 전 **‘해도돼?’**를 통해 꼭 필요한 주의사항을 확인하고,
 동행자와 함께 더 안전하고 현명한 여행을 준비해 보세요.
+
+## 대량 데이터 배치 반영
+
+전체 Seed를 한 번에 실행하지 않고 허용된 배치만 비파괴 upsert할 수 있습니다.
+
+```bash
+NODE_ENV=production ALLOW_PRODUCTION_SEED=true npm run db:batch -- official-expansion-v2
+NODE_ENV=production ALLOW_PRODUCTION_SEED=true npm run db:batch -- cultural-signals-bulk-v2
+npm run db:rollout:audit
+```
+
+`db:batch`는 국가·지역·도시·Warning·Source를 안정 key 기준으로 갱신합니다. `db:rollout:audit`는 누락 key, 공식 출처 누락, 문화 신호의 잘못된 상태, 동일 국가·지역·도시·제목 중복을 검사합니다.
