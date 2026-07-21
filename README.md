@@ -114,3 +114,7 @@ npm run db:rollout:audit
 ```
 
 `db:batch`는 국가·지역·도시·Warning·Source를 안정 key 기준으로 갱신합니다. `db:rollout:audit`는 누락 key, 공식 출처 누락, 문화 신호의 잘못된 상태, 동일 국가·지역·도시·제목 중복을 검사합니다.
+
+## 관리자 콘솔
+
+검수 큐, OfficialSource 등록, 원문 수집, NVIDIA 초안 생성, 영상 후보, 작업 이력은 `/admin`에서 관리합니다. 인증 환경변수와 운영 절차는 [`docs/admin-console.md`](docs/admin-console.md)를 참고하세요.

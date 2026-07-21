@@ -255,6 +255,53 @@ model VideoSourceCandidate {
   @@index([channelName])
 }
 
+enum AdminJobType {
+  COLLECT_SOURCE
+  DRAFT_CONTENT
+  AUDIT_SOURCE
+  AUDIT_DATABASE
+}
+
+enum AdminJobStatus {
+  QUEUED
+  RUNNING
+  SUCCEEDED
+  FAILED
+}
+
+model AdminJob {
+  id          String         @id @default(cuid())
+  type        AdminJobType
+  status      AdminJobStatus @default(QUEUED)
+  targetType  String?
+  targetId    String?
+  input       Json?
+  output      Json?
+  error       String?
+  requestedBy String
+  startedAt   DateTime?
+  finishedAt  DateTime?
+  createdAt   DateTime       @default(now())
+  updatedAt   DateTime       @updatedAt
+
+  @@index([status, createdAt])
+  @@index([type, createdAt])
+}
+
+model AdminActionLog {
+  id         String   @id @default(cuid())
+  actor      String
+  action     String
+  targetType String
+  targetId   String?
+  metadata   Json?
+  createdAt  DateTime @default(now())
+
+  @@index([createdAt])
+  @@index([actor, createdAt])
+  @@index([targetType, targetId])
+}
+
 model SyncProfile {
   id            String   @id @default(cuid())
   token         String   @unique
