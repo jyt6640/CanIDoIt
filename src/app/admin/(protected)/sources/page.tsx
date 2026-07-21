@@ -1,12 +1,15 @@
 import Link from 'next/link';
 import { ExternalLink, Play, Plus, RefreshCw } from 'lucide-react';
 import { prisma } from '@/shared/db/prisma';
+import { requireAdmin } from '@/shared/admin/auth';
 
 export default async function AdminSourcesPage({
   searchParams,
 }: {
   searchParams: Promise<{ saved?: string; success?: string; jobError?: string }>;
 }) {
+  await requireAdmin();
+
   const messages = await searchParams;
   const sources = await prisma.officialSource.findMany({
     include: {
