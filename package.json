@@ -24,7 +24,9 @@
     "content:source:add": "node scripts/register-official-source.mjs",
     "content:audit": "node scripts/audit-sources.mjs",
     "content:audit:apply": "node scripts/enforce-source-trust.mjs",
-    "content:community:audit": "node scripts/audit-community-evidence.mjs"
+    "content:community:audit": "node scripts/audit-community-evidence.mjs",
+    "content:video:import": "node scripts/import-video-source-candidates.mjs",
+    "content:video:audit": "node scripts/audit-video-source-candidates.mjs"
   },
   "prisma": {
     "seed": "node prisma/seed.mjs"

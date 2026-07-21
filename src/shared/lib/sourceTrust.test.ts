@@ -50,4 +50,18 @@ describe('source trust', () => {
     expect(result.level).toBe('COMMUNITY');
     expect(result.label).toBe('여행자 후기');
   });
+
+  it('유튜버 영상을 여행 크리에이터 출처로 분류한다', () => {
+    const result = evaluateSourceTrust(
+      {
+        title: '여행 영상',
+        url: 'https://www.youtube.com/watch?v=example',
+        checkedAt: '2026-07-21T00:00:00.000Z',
+        kind: 'VIDEO_CREATOR',
+      },
+      new Date('2026-07-21T00:00:00.000Z'),
+    );
+    expect(result.level).toBe('VIDEO_CREATOR');
+    expect(result.label).toBe('여행 크리에이터 영상');
+  });
 });

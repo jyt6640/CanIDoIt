@@ -800,6 +800,10 @@ async function main() {
               checkedAt: s.checkedAt ? new Date(s.checkedAt) : null,
               kind: s.kind ?? 'OFFICIAL',
               platform: s.platform ?? null,
+              creatorName: s.creatorName ?? null,
+              publishedAt: s.publishedAt ? new Date(s.publishedAt) : null,
+              timestampSeconds: s.timestampSeconds ?? null,
+              claimSummary: s.claimSummary ?? null,
       }));
 
       await prisma.warning.upsert({

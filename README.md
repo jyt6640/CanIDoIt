@@ -121,6 +121,10 @@ src/
 
 ```bash
 npm run content:community:audit
+npm run content:video:import
+npm run content:video:audit
 ```
 
 이 감사 명령은 여행자 경험 기반 항목이 `VERIFIED`로 잘못 공개됐는지, 독립 출처가 2개 미만인지, 맥락·부작용·반례가 빠졌는지 검사합니다.
+
+`content:video:import`는 후보 YouTube URL의 oEmbed 메타데이터를 확인해 채널명과 영상 제목을 `VideoSourceCandidate`에 저장합니다. `content:video:audit`는 삭제·비공개·메타데이터 변경과 잘못된 `VERIFIED` 상태를 검사합니다. 영상 자막 전체는 저장하지 않습니다.
