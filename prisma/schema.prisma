@@ -61,6 +61,14 @@ enum SourceKind {
   VIDEO_CREATOR
 }
 
+enum SourceLinkStatus {
+  UNKNOWN
+  HEALTHY
+  BLOCKED
+  NOT_FOUND
+  ERROR
+}
+
 model Country {
   id       String    @id @default(cuid())
   name     String    @unique // 표시명 (예: 일본)
@@ -218,8 +226,14 @@ model Source {
   publishedAt DateTime?
   timestampSeconds Int?
   claimSummary String?
+  linkStatus SourceLinkStatus @default(UNKNOWN)
+  lastLinkCheckedAt DateTime?
+  lastHttpStatus Int?
+  finalUrl String?
   warning   Warning   @relation(fields: [warningId], references: [id], onDelete: Cascade)
   warningId String
+
+  @@index([linkStatus])
 }
 
 model VideoSourceCandidate {
