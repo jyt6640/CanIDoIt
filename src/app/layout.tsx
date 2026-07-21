@@ -22,8 +22,11 @@ export const viewport: Viewport = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="ko">
-      <body>{children}<PwaRegistration /></body>
-      <Analytics />
+      <body>
+        {children}
+        <PwaRegistration />
+        <Analytics />
+      </body>
     </html>
   );
 }
