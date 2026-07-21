@@ -5,6 +5,7 @@ import type { AdminJobType, Prisma } from '@prisma/client';
 import { prisma } from '@/shared/db/prisma';
 import { nimChatJson, nvidiaModels } from '@/shared/ai/nvidiaNim';
 import { writeAdminLog } from './audit';
+import { assertDirectFetchContentType, sanitizeExtractedText } from './sourceContent';
 
 const cleanHtml = (html: string) => html
   .replace(/<script[\s\S]*?<\/script>/gi, ' ')
@@ -13,9 +14,7 @@ const cleanHtml = (html: string) => html
   .replace(/&nbsp;/g, ' ')
   .replace(/&amp;/g, '&')
   .replace(/&#39;/g, "'")
-  .replace(/&quot;/g, '"')
-  .replace(/\s+/g, ' ')
-  .trim();
+  .replace(/&quot;/g, '"');
 
 const fetchDirect = async (url: string) => {
   const response = await fetch(url, {
@@ -24,14 +23,18 @@ const fetchDirect = async (url: string) => {
     signal: AbortSignal.timeout(20_000),
   });
   if (!response.ok) throw new Error(`Direct fetch failed: HTTP ${response.status}`);
+  const contentType = response.headers.get('content-type');
+  assertDirectFetchContentType(contentType);
   const html = await response.text();
+  const text = sanitizeExtractedText(cleanHtml(html));
+  if (!text) throw new Error('Direct fetch returned empty text content.');
   return {
     provider: 'direct-fetch',
-    text: cleanHtml(html),
+    text,
     metadata: {
       status: response.status,
       finalUrl: response.url,
-      contentType: response.headers.get('content-type'),
+      contentType,
     },
   };
 };
@@ -51,11 +54,11 @@ const fetchFirecrawl = async (url: string) => {
     markdown?: string;
     metadata?: Record<string, unknown>;
   };
-  const text = payload.data?.markdown ?? payload.markdown ?? '';
-  if (!text.trim()) throw new Error('Firecrawl returned empty content.');
+  const text = sanitizeExtractedText(payload.data?.markdown ?? payload.markdown ?? '');
+  if (!text) throw new Error('Firecrawl returned empty content.');
   return {
     provider: 'firecrawl',
-    text: text.trim(),
+    text,
     metadata: payload.data?.metadata ?? payload.metadata ?? {},
   };
 };
@@ -70,7 +73,8 @@ const collectSource = async (sourceId: string) => {
   const collected = provider === 'firecrawl'
     ? await fetchFirecrawl(source.url)
     : await fetchDirect(source.url);
-  const text = collected.text.slice(0, 250_000);
+  const text = sanitizeExtractedText(collected.text).slice(0, 250_000);
+  if (!text) throw new Error('Collected source produced no usable text.');
   const contentHash = crypto.createHash('sha256').update(text).digest('hex');
   const previous = await prisma.sourceSnapshot.findFirst({
     where: { sourceId },
