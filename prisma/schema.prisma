@@ -25,12 +25,40 @@ enum RiskLevel {
   INFO
 }
 
+enum RegionType {
+  STATE
+  PROVINCE
+  TERRITORY
+  ISLAND
+  ISLAND_GROUP
+  METRO_AREA
+  PROVINCE_GROUP
+  AUTONOMOUS_REGION
+  COUNTRY_SUBDIVISION
+  OTHER
+}
+
 model Country {
   id       String    @id @default(cuid())
   name     String    @unique // 표시명 (예: 일본)
   slug     String    @unique // URL 슬러그 (예: japan)
   cities   City[]
+  regions  Region[]
   warnings Warning[]
+}
+
+model Region {
+  id        String     @id @default(cuid())
+  name      String
+  slug      String
+  type      RegionType @default(OTHER)
+  country   Country    @relation(fields: [countryId], references: [id], onDelete: Cascade)
+  countryId String
+  cities    City[]
+  warnings  Warning[]
+
+  @@unique([countryId, slug])
+  @@index([countryId, type])
 }
 
 model City {
@@ -39,6 +67,8 @@ model City {
   slug      String // URL 슬러그 (예: osaka)
   country   Country   @relation(fields: [countryId], references: [id], onDelete: Cascade)
   countryId String
+  region    Region?   @relation(fields: [regionId], references: [id], onDelete: SetNull)
+  regionId  String?
   warnings  Warning[]
 
   @@unique([countryId, slug])
@@ -72,6 +102,8 @@ model Warning {
   countryId String
   city      City?   @relation(fields: [cityId], references: [id], onDelete: Cascade)
   cityId    String? // null = 국가 공통
+  region    Region? @relation(fields: [regionId], references: [id], onDelete: Cascade)
+  regionId  String? // null = 국가 또는 도시 범위
 
   sources Source[]
 
@@ -80,6 +112,7 @@ model Warning {
 
   @@index([countryId])
   @@index([cityId])
+  @@index([regionId])
   @@index([archived])
   @@index([status])
 }
