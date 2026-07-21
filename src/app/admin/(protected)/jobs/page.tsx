@@ -1,5 +1,6 @@
 import { Database, RefreshCw } from 'lucide-react';
 import { prisma } from '@/shared/db/prisma';
+import { requireAdmin } from '@/shared/admin/auth';
 
 const pretty = (value: unknown) => value == null ? '' : JSON.stringify(value, null, 2);
 
@@ -8,6 +9,8 @@ export default async function AdminJobsPage({
 }: {
   searchParams: Promise<{ success?: string; jobError?: string }>;
 }) {
+  await requireAdmin();
+
   const messages = await searchParams;
   const [jobs, logs] = await Promise.all([
     prisma.adminJob.findMany({ orderBy: { createdAt: 'desc' }, take: 100 }),
