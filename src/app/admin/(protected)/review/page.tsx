@@ -2,6 +2,7 @@ import Link from 'next/link';
 import type { Prisma, WarningStatus } from '@prisma/client';
 import { Search } from 'lucide-react';
 import { prisma } from '@/shared/db/prisma';
+import { requireAdmin } from '@/shared/admin/auth';
 import { WARNING_STATUSES } from '@/shared/admin/validation';
 
 const PAGE_SIZE = 30;
@@ -18,6 +19,8 @@ export default async function AdminReviewPage({
 }: {
   searchParams: Promise<{ q?: string; status?: string; page?: string }>;
 }) {
+  await requireAdmin();
+
   const params = await searchParams;
   const query = params.q?.trim() ?? '';
   const status = WARNING_STATUSES.includes(params.status as WarningStatus)
